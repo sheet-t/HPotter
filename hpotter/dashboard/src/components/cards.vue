@@ -11,7 +11,6 @@
     </v-layout>
   </v-container>
 </template>
-First Sli
 
 <script>
   import statcard from './statcard';
