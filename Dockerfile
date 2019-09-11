@@ -21,6 +21,13 @@ COPY requirements.txt setup.py ./
 RUN pip install -r requirements.txt
 COPY hpotter ./hpotter/
 COPY runit.sh README.md RSAKey.cfg ./
+
+#add required files for testing
+COPY tests tests
+COPY test.sh test.sh
+
 RUN chmod +x ./runit.sh
 
 ENTRYPOINT [ "ash", "./runit.sh" ]
+
+#CMD [/test.sh, "test arguments"]
