@@ -24,11 +24,21 @@ COPY hpotter ./hpotter/
 COPY runit.sh README.md RSAKey.cfg ./
 
 #add required files for testing
+<<<<<<< HEAD
 COPY hpotter/tests ./hpotter/tests
+=======
+COPY tests tests
+>>>>>>> adding testing features to Dockerfile
 COPY test.sh test.sh
 
 RUN chmod +x ./runit.sh
 
+<<<<<<< HEAD
 #ENTRYPOINT [ "ash", "./runit.sh" ]
 
 ENTRYPOINT ["./test.sh", "ash"]
+=======
+ENTRYPOINT [ "ash", "./runit.sh" ]
+
+#CMD [/test.sh, "test arguments"]
+>>>>>>> adding testing features to Dockerfile
