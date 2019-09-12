@@ -1,1 +1,1 @@
-exec python3 -m ${1:-hpotter/test}
+exec python3 -m unittest discover ./hpotter/test
