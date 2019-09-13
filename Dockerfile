@@ -27,6 +27,7 @@ COPY runit.sh README.md RSAKey.cfg ./
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 COPY hpotter/tests ./hpotter/tests
 =======
 COPY tests tests
@@ -37,10 +38,14 @@ COPY tests tests
 =======
 COPY hpotter/tests ./hpotter/tests
 >>>>>>> docker testing
+=======
+COPY hpotter/tests ./hpotter/tests
+>>>>>>> f4aa9d564b8a74a8782f44006210638b5ccf8f4f
 COPY test.sh test.sh
 
 RUN chmod +x ./runit.sh
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 #ENTRYPOINT [ "ash", "./runit.sh" ]
@@ -59,3 +64,8 @@ ENTRYPOINT [ "ash", "./runit.sh" ]
 
 ENTRYPOINT ["./test.sh", "ash"]
 >>>>>>> docker testing
+=======
+#ENTRYPOINT [ "ash", "./runit.sh" ]
+
+ENTRYPOINT ["./test.sh", "ash"]
+>>>>>>> f4aa9d564b8a74a8782f44006210638b5ccf8f4f
