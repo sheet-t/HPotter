@@ -16,7 +16,7 @@
           <v-col> <!--Main Content-->
 
             <v-row>
-              <cards v-on:update:content="updateContent($event)" :kpi="kpi"/>
+              <cards v-on:update:content="updateContent($event)" :kpi="kpi":contentID="contentID"/>
             </v-row>
 
             <v-row>
