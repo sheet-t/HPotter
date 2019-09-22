@@ -8,7 +8,8 @@
 
 <template>
   <v-app>
-    <v-navigation-drawer app class="elevation-3"> <!--Sidebar-->
+    <v-navigation-drawer app class="elevation-3">
+      <sideNavBar /> <!--Sidebar-->
     </v-navigation-drawer> <!--End Sidebar-->
     <v-content>
       <v-container ma-2>
@@ -16,7 +17,7 @@
           <v-col> <!--Main Content-->
 
             <v-row>
-              <cards v-on:update:content="updateContent($event)" :kpi="kpi":contentID="contentID"/>
+              <cards v-on:update:content="updateContent($event)" :kpi="kpi" :contentID="contentID"/>
             </v-row>
 
             <v-row>
@@ -39,6 +40,7 @@
 
 <script>
 
+import sideNavBar from './components/sideNavBar';
 import cards from './components/cards';
 import drillDownWindow from './components/drilldownwindow';
 
@@ -48,6 +50,7 @@ export default {
 
   name: 'App',
   components: {
+    sideNavBar,
     cards,
     drillDownWindow
   },
