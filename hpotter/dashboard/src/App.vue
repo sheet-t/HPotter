@@ -30,8 +30,7 @@
             <v-date-picker class="elevation-3"></v-date-picker>
 
           </v-col> <!--End Right Bar-->
-
-          <div class="d-lg-none"><v-btn fixed dark fab bottom right color="primary"><v-icon>mdi-calendar</v-icon></v-btn></div>
+          <v-fab-transition><v-btn v-show="$vuetify.breakpoint.mdAndDown" fixed dark fab bottom right color="primary"><v-icon>mdi-calendar</v-icon></v-btn></v-fab-transition>
         </v-row>
       </v-container>
     </v-content>
@@ -59,7 +58,7 @@ export default {
       { name: 'Creds Used', value: '29', icon: 'mdi-lock-open-outline', id: '3' },
       { name: 'Countries', value: '5', icon: 'mdi-map-marker', id: '4' }
     ],
-    content: 1 
+    content: 1,
   }),
   methods: {
     updateContent(value) {
