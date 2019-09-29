@@ -1,9 +1,8 @@
 from hpotter.machine_learning.http_commands.helpers.helper import create_checkpoints_dir
 from hpotter.machine_learning.http_commands.helpers.parser import Data
 from hpotter.machine_learning.http_commands.helpers.vocabulary import Vocabulary
-from hpotter.machine_learning.http_commands.model import Model
+from hpotter.machine_learning.http_commands.model import Model, BASE_PATH
 from hpotter.machine_learning.http_commands.trainer import Trainer
-BASE_PATH = 'hpotter/machine_learning/http_commands/'
 
 create_checkpoints_dir(BASE_PATH + "checkpoints/")
 d = Data(path=BASE_PATH + 'data/benign_requests.txt')

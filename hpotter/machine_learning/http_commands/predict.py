@@ -2,7 +2,7 @@ import numpy as np
 
 from hpotter.machine_learning.http_commands.helpers.parser import Data
 from hpotter.machine_learning.http_commands.helpers.vocabulary import Vocabulary
-from hpotter.machine_learning.http_commands.learn import BASE_PATH
+from hpotter.machine_learning.http_commands.model import BASE_PATH
 from hpotter.machine_learning.http_commands.predictor import Predictor
 
 d = Data(path=BASE_PATH + 'data/benign_requests.txt')
