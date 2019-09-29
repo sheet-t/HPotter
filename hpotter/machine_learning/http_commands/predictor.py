@@ -17,6 +17,7 @@ class Predictor:
 
     def __load(self):
         try:
+            tf.reset_default_graph()
             loaded_graph = tf.Graph()
             with loaded_graph.as_default():
                 saver = tf.train.import_meta_graph(self.graph_path + '.meta')

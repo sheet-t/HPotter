@@ -1,14 +1,20 @@
-colorama
 SQLAlchemy
 SQLAlchemy-Utils
 cffi
 paramiko
 docker
 maxminddb-geolite2
+
+# GraphQL/graphene requirements
 graphene
 graphene_sqlalchemy
+flask_graphql
+
+# CLI-based Code Coverage
 coverage
+
+# Machine Learning requirements
+colorama
 numpy==1.16.4
 sklearn
 tensorflow==1.8.0
-flask_graphql

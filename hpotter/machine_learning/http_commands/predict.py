@@ -26,3 +26,5 @@ num_samples = len(anomalous_predictions)
 print("\r\nNumber of True Positives: ", tps)
 print("Number of Samples: ", num_samples)
 print("True Positive Rate: ", (tps / num_samples))
+
+print("\r\n\r\nLogits: ", predictor.logits)
