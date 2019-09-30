@@ -4,8 +4,8 @@
   <v-container>
     <v-layout row wrap ma-2>
       <v-flex>
-        <v-window :contentID="contentID" v-on:update:content="$emit('update:content')">
-          <v-window-item v-if="contentID == 1">
+        <v-window v-model="selectedWindow">
+          <v-window-item value="1">
             <v-card class="elevation-3">
               <v-card-title>Attacks</v-card-title>
               <v-card-text>
@@ -34,7 +34,7 @@
             </v-card>
           </v-window-item>
 
-          <v-window-item v-if="contentID == 2">
+          <v-window-item value="2">
             <v-card class="elevation-3">
               <v-card-title>Plug-ins</v-card-title>
               <v-card-text>
@@ -47,7 +47,7 @@
             </v-card>
           </v-window-item>
 
-          <v-window-item v-if="contentID == 3">
+          <v-window-item value="3">
             <v-card ma-2 class="elevation-3">
               <v-card-title>Creds Used</v-card-title>
               <v-card-text>
@@ -60,7 +60,7 @@
             </v-card>
           </v-window-item>
 
-          <v-window-item v-if="contentID == 4">
+          <v-window-item value="4">
             <v-card class="elevation-3">
               <v-card-title>Countries</v-card-title>
               <v-card-text>
@@ -81,6 +81,18 @@
 
 <script>
   export default{
+    data: () => ({
+    }),
+    computed: {
+      selectedWindow: {
+        get: function () {
+          return this.contentID
+        },
+        set: function () {
+          return this.contentID
+        }
+      }
+    },
     props:['contentID']
   }
 </script>
