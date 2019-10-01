@@ -4,9 +4,9 @@
   <v-container>
     <v-layout row wrap ma-2>
       <v-flex>
-        <v-window v-model="selectedWindow">
+        <v-window v-bind:value="contentID">
           <v-window-item value="1">
-            <v-card class="elevation-3">
+            <v-card>
               <v-card-title>Attacks</v-card-title>
               <v-card-text>
               S	A	T	O	R<br>
@@ -35,7 +35,7 @@
           </v-window-item>
 
           <v-window-item value="2">
-            <v-card class="elevation-3">
+            <v-card>
               <v-card-title>Plug-ins</v-card-title>
               <v-card-text>
               S	A	T	O	R<br>
@@ -48,7 +48,7 @@
           </v-window-item>
 
           <v-window-item value="3">
-            <v-card ma-2 class="elevation-3">
+            <v-card>
               <v-card-title>Creds Used</v-card-title>
               <v-card-text>
               S	A	T	O	R<br>
@@ -61,7 +61,7 @@
           </v-window-item>
 
           <v-window-item value="4">
-            <v-card class="elevation-3">
+            <v-card>
               <v-card-title>Countries</v-card-title>
               <v-card-text>
               S	A	T	O	R<br>
@@ -83,16 +83,6 @@
   export default{
     data: () => ({
     }),
-    computed: {
-      selectedWindow: {
-        get: function () {
-          return this.contentID
-        },
-        set: function () {
-          return this.contentID
-        }
-      }
-    },
     props:['contentID']
   }
 </script>
