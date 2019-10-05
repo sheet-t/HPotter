@@ -24,13 +24,12 @@ does not match is then considered an anomaly. Below demonstrates a high level ar
 
 ![Screen Shot 2019-09-23 at 11 49 45 AM](https://user-images.githubusercontent.com/32188816/65449483-52a9d300-ddf8-11e9-8af0-4d2840a9e167.png)
  
-Once the machine learning algorithm is trained and predictions are made, text will be generated
-that contains the HTTP requests that were detected as anomalies. This text highlights each malicious HTTP request
-and the associated characters that contributed to the anomalous prediction highlighted in red, as shown below.
+Once the machine learning algorithm is trained and predictions are made, `hpotter/machine_learning/http_commands/anomaly_report.html`
+will be generated which contains the HTTP requests detected as anomalies. The text in this file enumerates 
+each malicious HTTP request and the associated characters that contributed to the anomalous prediction highlighted in 
+red, as shown below.
   
-  
-![Screen Shot 2019-09-23 at 11 46 52 AM](https://user-images.githubusercontent.com/32188816/65449319-f646b380-ddf7-11e9-9036-7ae2ff520b7e.png)
-
+![Screen Shot 2019-10-05 at 11 56 55 AM](https://user-images.githubusercontent.com/32188816/66258858-5548e880-e767-11e9-8493-e09e0a500fdb.png)
   
 ## Training Datasets
 The model is set to train over 40 epochs or until a minimum average training loss lower than 0.35 is 
@@ -38,6 +37,5 @@ achieved. Train, test and validation split is created from 310,000 benign sample
 file and 15,402 anomalous samples from the `anomalous_requests.txt` file in the same directory.
   
 ## Saved Model
-Training the model takes time, and as such it is important to save checkpoints in the model's training
-process if adjustments need to be made. These checkpoints are stored in the `hpotter/machine_learning/http_commands/checkpoints`
-directory are used to make predictions on future HTTP requests.
+Checkpoints of the model's training progress are saved if adjustments need to be made or for future training purposes. 
+These checkpoints are stored in the `hpotter/machine_learning/http_commands/checkpoints` directory.
