@@ -77,4 +77,12 @@ class SQL(Base):
     connection = relationship('Connections')
 
 
-Base.prepare(engine)
+def checkForTables():
+    #checks for one table, if this table exists it is assumed that all tables exist
+    if engine.dialect.has_table(engine, 'Connections'):
+        Base.prepare(engine)
+        return(engine.dialect.has_table)
+    else:
+        Base.metadata.create_all(engine)
+
+checkForTables()

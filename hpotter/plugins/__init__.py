@@ -1,2 +1,2 @@
-__all__ = ['telnet', 'ssh', 'httpipe']
-# __all__ = ['telnet', 'httpipe', 'mariadb']
+__plugins__ = ['httpipe', 'mariadb']
+__shutdown__ = ['mariadb', 'httpipe']
