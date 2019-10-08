@@ -23,30 +23,6 @@ listen_port: 80
 table: HTTPCommands
 capture_length: HTTP_COMMAND_LENGTH
 ---
-name: ssh
-setup:
-    mkdir: 'alpine'
-teardown:
-    rmdir: 'alpine'
-container: 'alpine:latest'
-alt_container: ''
-read_only: True
-detach: True
-tls: False
-ports:
-    from: 22/tcp
-    connect_address: '127.0.0.2'
-    connect_port: 2222
-volumes:
-    alpine:
-        bind: /usr/local/alpine/logs
-        mode: rw
-environment: None
-listen_address: 0.0.0.0
-listen_port: 22
-table: ShellCommands
-capture_length: SHELL_COMMAND_LENGTH
----
 name: mariadb
 setup:
     mkdir: ['tmp', 'mysql']
@@ -67,30 +43,6 @@ listen_address: 0.0.0.0
 listen_port: 3306
 table: SQL
 capture_length: SQL_COMMAND_LENGTH
----
-name: telnet
-setup:
-    mkdir: 'alpine'
-teardown:
-    rmdir: 'alpine'
-container: 'alpine:latest'
-alt_container: ''
-read_only: True
-detach: True
-tls: True
-ports:
-    from: 23/tcp
-    connect_address: '127.0.0.2'
-    connect_port: 8000
-volumes:
-    alpine:
-        bind: /usr/local/alpine/logs
-        mode: rw
-environment: None
-listen_address: 0.0.0.0
-listen_port: 8000
-table: ShellCommands
-capture_length: SHELL_COMMAND_LENGTH
 ---
 name: httpd_tls
 setup:
