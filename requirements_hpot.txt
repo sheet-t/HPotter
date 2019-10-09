@@ -1,0 +1,8 @@
+SQLAlchemy
+SQLAlchemy-Utils
+cffi
+paramiko
+docker
+coverage
+numpy==1.16.4
+pyyaml

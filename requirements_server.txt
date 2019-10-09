@@ -1,0 +1,7 @@
+maxminddb-geolite2
+graphene
+graphene_sqlalchemy
+sklearn
+tensorflow
+flask_graphql
+coverage
