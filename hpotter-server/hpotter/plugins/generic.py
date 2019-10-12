@@ -3,6 +3,7 @@ import threading
 
 from hpotter import tables
 from hpotter.env import logger, write_db
+import hpotter.plugins.plugin as plugins
 
 # remember to put name in __init__.py
 
@@ -94,7 +95,10 @@ class PipeThread(threading.Thread):
         source_socket.settimeout(5)
         source_socket.bind(self.bind_address)
         source_socket.listen()
-        TLS = False         # will pivot from plugin.py     ##TO-DO HPOT_45
+
+        print(self.__dict__)
+        TLS = plugins.Plugin.read_in_all_plugins().__getitem__(0).tls         # TODO pivots from plugin.py, but need to make __getitem__(i) not ..(0) 
+    
         internal_count = 0
 
         while True:
@@ -104,7 +108,7 @@ class PipeThread(threading.Thread):
                     source, address = source_socket.accept()
                     if TLS:
                         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                        context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
+                        context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")                # TODO permanent path to certs needs TBD
                         source = context.wrap_context(source, server_side=True)
                 except socket.timeout:
                     internal_count = internal_count + 1
