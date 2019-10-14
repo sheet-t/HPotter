@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center">A clean threat detection honeypot built on Docker.</h4>
+<h4 align="center">A clever threat detection honeypot built on docker.</h4>
 
 <p align="center">
   <a href="#key-features">Features</a> •
