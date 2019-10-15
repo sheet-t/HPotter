@@ -42,7 +42,7 @@ $ git clone https://github.com/sheet-t/HPotter
 # Navigate to Hpotter-server
 $ cd hpotter-server
 
-#install the necessary packages
+# Install the necessary packages
 $ pip install -r requirements.txt
 
 ```
