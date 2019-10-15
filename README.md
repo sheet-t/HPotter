@@ -31,7 +31,7 @@ The Hpotter project is divided into two portions. The core product which collect
 
 ## How To Use
 
-# Hpotter-server
+### Hpotter-server
 
 To clone and run hpotter-server, you'll need [Git](https://git-scm.com) and [Python 3](https://www.python.org/) installed on your computer. From your command line:
 
@@ -57,7 +57,7 @@ $ python3 -m hpotter
 
 For more advanced details, see the included README.md file within hotter-server.
 
-# Hpotter-app
+### Hpotter-app
 To clone and run hpotter-app, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) installed on your computer. From your command line:
 
 ```bash
