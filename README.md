@@ -42,7 +42,7 @@ $ git clone https://github.com/sheet-t/HPotter
 # Navigate to Hpotter-server
 $ cd hpotter-server
 
-# Install the necessary packages
+# Install Hpotter-server's dependencies
 $ pip install -r requirements.txt
 
 ```
@@ -67,7 +67,7 @@ $ git clone https://github.com/sheet-t/HPotter
 # Navigate to Hpotter-app
 $ cd hpotter-app
 
-# Install Hpotter-app's Dependancies
+# Install Hpotter-app's dependencies
 $ npm install
 
 # Run the app
