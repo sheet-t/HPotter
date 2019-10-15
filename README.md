@@ -21,7 +21,7 @@
 * Gather data on attempted attacks from a variety of sources.
 * Compatible with the Raspberry Pi
 * A full dashboard for your data
-* Utilize machine learning analyze your data.
+* Utilize machine learning to analyze your data.
 
 ## Project Structure
 The Hpotter project is divided into two portions. The core product which collects data, Hpotter-server, and a front end for viewing the data and analysing it, Hpotter-app. Hpotter-server is extremely lightweight and built to be deployable even on single-board computers like the Raspberry Pi. Meanwhile, Hpotter-app is built to be run on your home or work computer to work upon the data after collection. 
