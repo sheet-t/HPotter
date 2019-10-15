@@ -43,6 +43,9 @@ $ cd hpotter-server
 # Install Hpotter-server's dependencies
 $ pip install -r requirements.txt
 
+# On Windows, use
+$ pip install -r winrequirements.txt
+
 ```
 
 From there, you can run the Honeypot with:
