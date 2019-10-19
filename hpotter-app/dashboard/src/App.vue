@@ -33,6 +33,7 @@
       <div class="mt-8">
         <v-date-picker v-model="viewDate"></v-date-picker>
       </div>
+      <v-sparkline :value="weekData"></v-sparkline>
     </v-navigation-drawer>
     <v-content>
       <v-container ma-2>
@@ -85,6 +86,7 @@ export default {
     ],
     viewDate: new Date().toISOString().substr(0, 10),
     content: 1,
+    weekData: [0, 2, 5, 9, 5, 10, 0],
   }),
   methods: {
     updateContent(value) {
