@@ -27,13 +27,13 @@
 <template>
   <v-app>
     <v-navigation-drawer floating app class="elevation-3 slateNav"><!--Left Sidebar-->
-      <sideNavBar />
+      <sideNavBar v-on:update:window="updateWindow($event)"/>
     </v-navigation-drawer> <!--End Sidebar-->
     <v-navigation-drawer floating right app width="300px" class="hiddenNav"><!--Right hand content-->
       <div class="mt-8">
         <v-date-picker v-model="viewDate"></v-date-picker>
       </div>
-      <br />
+      <br /> <!-- Space with CSS -->
       <v-card class="mr-2 text-center">
         <v-card-title>
         Activity
@@ -46,17 +46,33 @@
     <v-content>
       <v-container ma-2>
         <v-row>
-          <v-col> <!--Main Content-->
+          <v-col>
+            <v-window v-model='window'> <!--Main Content-->
 
-            <v-row>
-              <cards v-on:update:content="updateContent($event)" :kpi="kpi" :contentID="contentID" />
-            </v-row>
+              <!--Dashboard-->
+              <v-window-item>
+                <v-row>
+                  <cards v-on:update:content="updateContent($event)" :kpi="kpi" :contentID="contentID" />
+                </v-row>
 
-            <v-row>
-              <drillDownWindow :contentID="contentID"/>
-            </v-row>
+                <v-row>
+                  <drillDownWindow :contentID="contentID"/>
+                </v-row>
+              </v-window-item>
 
-        </v-col> <!--End Main Content-->
+
+              <!--Analytics-->
+              <v-window-item>
+                <v-card>
+                  <v-card-text>
+                    Analytics Here
+                  </v-card-text>
+                </v-card>
+              </v-window-item>
+
+
+            </v-window> <!--End Main Content-->
+          </v-col>
           <v-dialog v-model="dialog" width="300">
             <template v-slot:activator="{ on }">
               <v-fab-transition><v-btn v-on="on" v-show="$vuetify.breakpoint.mdAndDown" fixed dark fab bottom right color="primary"><v-icon>mdi-calendar</v-icon></v-btn></v-fab-transition>
@@ -86,6 +102,7 @@ export default {
     drillDownWindow
   },
   data: () => ({
+    window: 0,
     kpi: [
       { name: 'Attacks', value: '128', icon: 'mdi-knife-military', id: '1' },
       { name: 'Attack Vectors', value: '6', icon: 'mdi-directions-fork', id: '2' },
@@ -108,6 +125,9 @@ export default {
   methods: {
     updateContent(value) {
       return this.content = value
+    },
+    updateWindow(value) {
+      return this.window = value
     }
   },
   computed: {
