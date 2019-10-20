@@ -40,27 +40,7 @@
     creds,
     IPmap
     },
-    data: () => ({
-      valueAttacks: [0, 2, 5, 9, 5, 10, 0, 5],
-      labelsAttacks: [
-        '12am',
-        '3am',
-        '6am',
-        '9am',
-        '12pm',
-        '3pm',
-        '6pm',
-        '9pm',
-      ],
-      vectors: [
-        { name: 'Telnet', port: 23, number: 3 },
-        { name: 'ssh', port: 22, number: 7 },
-        { name: 'Maria', port: 3306, number: 2 },
-        { name: 'http', port: 22, number: 0 },
-        { name: 'https', port: 443, number: 18 },
-        { name: 'maria_tls', port: 99, number: 4 }
-      ],
-    }),
-    props:['contentID']
+    data: () => ({}),
+    props:['contentID', 'valueAttacks', 'labelsAttacks', 'vectors']
   }
 </script>
