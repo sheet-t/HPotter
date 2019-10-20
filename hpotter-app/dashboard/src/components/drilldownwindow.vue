@@ -6,57 +6,19 @@
       <v-flex>
         <v-window v-bind:value='contentID'>
           <v-window-item value='1'>
-            <v-card class="mx-auto text-center">
-              <v-card-text>
-                <div class="display-1 font-weight-thin">Attacks Last 24h</div>
-              </v-card-text>
-              <v-card-text>
-                <v-sparkline
-    :value='valueAttacks' :labels='labelsAttacks' color='white' stroke-linecap='round' show-labels smooth auto-draw></v-sparkline>
-              </v-card-text>
-              <v-divider></v-divider>
-              <v-card-actions>
-                <v-chip-group color='primary' mandatory>
-                  <v-chip>
-                    Past Day
-                  </v-chip>
-                  <v-chip>
-                    Past Hour
-                  </v-chip>
-                  <v-chip>
-                    Past Minute
-                  </v-chip>
-                  <v-chip>
-                    Past Second
-                  </v-chip>
-                </v-chip-group>
-              </v-card-actions>
-            </v-card>
+            <attacks :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" />
           </v-window-item>
 
           <v-window-item value='2'>
-            <v-card class="mx-auto">
-              <v-card-text>
-                <div class="display-1 font-weight-thin  text-center">Attack Vectors</div>
-              </v-card-text>
-              <v-card-text>
-                <!-- TODO: CHange to Datatable, probably convert each one to a componant, this is getting a lot. -->
-              </v-card-text>
-            </v-card>
+            <vectors />
           </v-window-item>
 
           <v-window-item value='3'>
-            <v-card>
-              <v-card-text>
-              </v-card-text>
-            </v-card>
+            <creds />
           </v-window-item>
 
           <v-window-item value='4'>
-            <v-card>
-              <v-card-text>
-              </v-card-text>
-            </v-card>
+            <IPmap />
           </v-window-item>
         </v-window>
       </v-flex>
@@ -66,7 +28,18 @@
 
 
 <script>
+  import attacks from './drilldownwindow/attacks';
+  import vectors from './drilldownwindow/vectors';
+  import creds from './drilldownwindow/creds';
+  import IPmap from './drilldownwindow/map';
+
   export default{
+  components: {
+    attacks,
+    vectors,
+    creds,
+    IPmap
+    },
     data: () => ({
       valueAttacks: [0, 2, 5, 9, 5, 10, 0, 5],
       labelsAttacks: [
