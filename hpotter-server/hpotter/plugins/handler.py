@@ -103,11 +103,20 @@ def start_plugins():
     all_plugins = Plugin.read_in_all_plugins()
     current_thread = None
     current_container = None
+    client = docker.from_env()
+    #create network -- figure out how to delete network when finished
+    try:
+        network = client.networks.create(name="network_1", driver="bridge", check_duplicate=True)
+    except docker.errors.APIError as err:
+        print(err)
+        #expand once i figure out how to dynamically remove networks
+        sys.exit()
+
+    logger.info("%s created to connect plugins", network.name)
+
     for plugin in all_plugins:
         if plugin is not None:
             try:
-                client = docker.from_env()
-
                 container = plugin.container
                 if platform.machine() == 'armv6l' :
                     container = plugin.alt_container
@@ -134,6 +143,10 @@ def start_plugins():
 
                 logger.info('Created: %s', plugin.name)
 
+                network.connect(current_container)
+                network.reload()
+                #debugging
+                print(network.containers)
             except OSError as err:
 
                 logger.info(err)
