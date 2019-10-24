@@ -89,6 +89,7 @@ class Plugin(yaml.YAMLObject):
                 plugins.append(p)
         return plugins
 
+client = docker.from_env()
 def start_plugins():
     #ensure Docker is running
     try:
@@ -103,8 +104,8 @@ def start_plugins():
     all_plugins = Plugin.read_in_all_plugins()
     current_thread = None
     current_container = None
-    client = docker.from_env()
     #create network -- figure out how to delete network when finished
+    global network
     try:
         network = client.networks.create(name="network_1", driver="bridge", check_duplicate=True)
     except docker.errors.APIError as err:
@@ -175,6 +176,7 @@ def stop_plugins():
     telnet.stop_server()
 
     for name, item in Singletons.active_plugins.items():
+        network.reload()
         try:
             for cmd in item["plugin"].teardown['rmdir']:
                 logger.info("---%s is removing the %s directory", name, cmd)
@@ -186,9 +188,15 @@ def stop_plugins():
         except OSError as error:
             logger.info(name + ": " + str(error))
             return
-
+        network.reload()       
         if item["container"] is not None:
             item["thread"].request_shutdown()
+            if not network.containers:
+                 print("No active plugins")
+                 client.networks.prune()
+                 logger.info("Network removed")
         logger.info("--- removing %s container", item["plugin"].name)
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
+        network.reload()
+        print(network.containers)
