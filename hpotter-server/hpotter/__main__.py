@@ -12,7 +12,6 @@ def shutdown_servers(signum, frame):
 
 def shutdown_win_servers(signum):
     stop_plugins()
-    # shell might have been started by telnet, ssh, ...
     stop_shell()
     close_db()
 
