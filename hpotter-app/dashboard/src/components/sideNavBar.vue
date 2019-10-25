@@ -26,7 +26,7 @@ p,<style scoped>
       <v-list-item-group v-model="item" color="white">
         <v-list-item
           v-for="(item, i) in items"
-          v-on:click="$emit('update:window' , i)"
+          v-on:click="updateWindow(i)" 
           :key="i">
           <v-list-item-icon>
             <v-icon v-text="item.icon"></v-icon>
@@ -56,5 +56,10 @@ p,<style scoped>
         ],
         item: 0,
       }),
+      methods: {
+        updateWindow(value) {
+          this.$store.dispatch('updateWindow', value)
+        }
+      }
     }
 </script>
