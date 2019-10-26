@@ -3,7 +3,7 @@ import threading
 
 from hpotter import tables
 from hpotter.env import logger, write_db
-import hpotter.plugins.plugin as plugins
+import hpotter.plugins.handler as plugins
 
 # remember to put name in __init__.py
 
@@ -78,7 +78,7 @@ class OneWayThread(threading.Thread):
 
 
 class PipeThread(threading.Thread):
-    def __init__(self, bind_address, connect_address, table, limit, request_type='', di=None):
+    def __init__(self, bind_address, connect_address, table, limit, request_type='', di=None, tls=False):
         super().__init__()
         self.bind_address = bind_address
         self.connect_address = connect_address
@@ -86,6 +86,7 @@ class PipeThread(threading.Thread):
         self.request_type = request_type
         self.limit = limit
         self.di = di
+        self.tls = tls
 
         self.shutdown_requested = False
 
@@ -95,9 +96,6 @@ class PipeThread(threading.Thread):
         source_socket.settimeout(5)
         source_socket.bind(self.bind_address)
         source_socket.listen()
-
-        print(self.__dict__)
-        TLS = plugins.Plugin.read_in_all_plugins().__getitem__(0).tls         # TODO pivots from plugin.py, but need to make __getitem__(i) not ..(0) 
     
         internal_count = 0
 
@@ -105,11 +103,12 @@ class PipeThread(threading.Thread):
             try:
                 source = None
                 try:
+                    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                    context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
+
                     source, address = source_socket.accept()
-                    if TLS:
-                        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                        context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")                # TODO permanent path to certs needs TBD
-                        source = context.wrap_context(source, server_side=True)
+                    if self.tls:
+                        source = context.wrap_socket(source, server_side=True)
                 except socket.timeout:
                     internal_count = internal_count + 1
                     if self.shutdown_requested:
