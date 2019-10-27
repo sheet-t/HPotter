@@ -5,10 +5,38 @@ import re
 import sys
 import subprocess
 import yaml
+import threading
 
 from hpotter.env import logger
 from hpotter.plugins.generic import PipeThread
 from hpotter.plugins import ssh, telnet
+
+client = docker.from_env()
+class NetBuilder():
+    def __init__(self, name=None, ipr=None, gate=None):
+        #set up IP range in a IPAM config for use in the network
+         self.name = name
+         ipam_pool = docker.types.IPAMPool(
+                 subnet = ipr + '/16',
+                 iprange = ipr + '/24',
+                 gateway = gate,
+                 aux_addresses = None
+                 )
+         ipam_config = docker.types.IPAMConfig(
+                 pool_configs=[ipam_pool]
+                 )
+         self.network = client.networks.create(
+                 name=name,
+                 driver="bridge",
+                 ipam=ipam_config
+                 )
+
+    def remove():
+         self.network.remove()
+
+#create network
+network = NetBuilder(name="Network_1", ipr='10.3.3.0', gate='10.3.3.254').network
+logger.info("Network: %s created", network.name)
 
 class Singletons():
     active_plugins = {}
@@ -89,7 +117,7 @@ class Plugin(yaml.YAMLObject):
                 plugins.append(p)
         return plugins
 
-client = docker.from_env()
+
 def start_plugins():
     #ensure Docker is running
     try:
@@ -104,16 +132,6 @@ def start_plugins():
     all_plugins = Plugin.read_in_all_plugins()
     current_thread = None
     current_container = None
-    #create network -- figure out how to delete network when finished
-    global network
-    try:
-        network = client.networks.create(name="network_1", driver="bridge", check_duplicate=True)
-    except docker.errors.APIError as err:
-        print(err)
-        #expand once i figure out how to dynamically remove networks
-        sys.exit()
-
-    logger.info("%s created to connect plugins", network.name)
 
     for plugin in all_plugins:
         if plugin is not None:
@@ -143,11 +161,8 @@ def start_plugins():
                         read_only=True)
 
                 logger.info('Created: %s', plugin.name)
-
                 network.connect(current_container)
-                network.reload()
-                #debugging
-                print(network.containers)
+                logger.info('Connected %s to %s network', plugin.name, network.name)
             except OSError as err:
 
                 logger.info(err)
@@ -176,7 +191,6 @@ def stop_plugins():
     telnet.stop_server()
 
     for name, item in Singletons.active_plugins.items():
-        network.reload()
         try:
             for cmd in item["plugin"].teardown['rmdir']:
                 logger.info("---%s is removing the %s directory", name, cmd)
@@ -188,15 +202,22 @@ def stop_plugins():
         except OSError as error:
             logger.info(name + ": " + str(error))
             return
-        network.reload()       
         if item["container"] is not None:
             item["thread"].request_shutdown()
-            if not network.containers:
-                 print("No active plugins")
-                 client.networks.prune()
-                 logger.info("Network removed")
         logger.info("--- removing %s container", item["plugin"].name)
+        network.disconnect(item["container"].name, True)
+        network.reload()
+
+        #avoid race conditions between singletons
+        lock = threading.Lock()
+        lock.acquire()
+
+        #remove network once all containers are disconnected
+        if not network.containers:
+            network.remove()
+            logger.info("--- network removed")
+            lock.release()
+        logger.info("--- %s container disconnected from %s", item["plugin"].name, network.name)
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
-        network.reload()
-        print(network.containers)
+        
