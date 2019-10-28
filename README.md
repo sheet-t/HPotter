@@ -1,83 +1,84 @@
+<h1 align="center">
+  <br>
+  <img src="https://i.imgur.com/gNYWW8e.png" alt="Hpotter" width="200">
+  <br>
+  Hpotter
+  <br>
+</h1>
 
-# HPotter
-A simple to install and run Honey Pot.
+<h4 align="center">A clever threat analysis honeypot built leveraging machine learning.</h4>
 
-[![Build Status](https://travis-ci.org/drsjb80/HPotter.svg?branch=master)](https://travis-ci.org/drsjb80/HPotter)
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#project-structure">Project Structure</a> •
+  <a href="#how-to-use">How To Use</a> •
+  <a href="#credits">Credits</a> •
+  <a href="#license">License</a>
+</p>
 
-## Running and developing
+## Features
 
-To install the necessary packages, do:
+* Gather data on attempted attacks from a variety of sources.
+* Compatible with the Raspberry Pi
+* A full dashboard for your data
+* Utilize machine learning to analyze your data.
 
-    pip install -r requirements.txt
+## Project Structure
+The Hpotter project is divided into two portions. The core product which collects data, Hpotter-server, and a front end for viewing the data and analysing it, Hpotter-app. Hpotter-server is extremely lightweight and built to be deployable even on single-board computers like the Raspberry Pi. Meanwhile, Hpotter-app is built to be run on your home or work computer to work upon the data after collection. 
 
-To run the honeypot itself, do:
 
-    python3 -m hpotter
+## How To Use
 
-To run the SQL to JSON webserver, do:
+### Hpotter-server
 
-    python3 -m hpotter.jsonserver
+To clone and run hpotter-server, you'll need [Git](https://git-scm.com) and [Python 3](https://www.python.org/) installed on your computer. From your command line:
 
-Once the jsonserver is running, you can see the current data by loading the
-ajax.html file that is in the directory above into your web browser.
+```bash
+# Clone this repository
+$ git clone https://github.com/sheet-t/HPotter
 
-To see the current contents of the database, do:
-    sqlite3 -list main.db .dump
+# Navigate to Hpotter-server
+$ cd hpotter-server
 
-The JSON API is easy to query. To get all the data, go to localhost:8080:
+# Install Hpotter-server's dependencies
+$ pip install -r requirements.txt
 
-    curl localhost:8080
+# On Windows, use
+$ pip install -r winrequirements.txt
 
-If you're interested in a particular table, reference that:
+```
 
-    curl localhost:8080/sh
+From there, you can run the Honeypot with:
 
-If you want to use JSONP, pass a callback:
+```bash
+# Run Hpotter-server
+$ python3 -m hpotter
 
-    curl localhost:8080/?callback=jQuery
+```
 
-To get JSON in the form to use with jTables, do:
+For more advanced details, see the included README.md file within hotter-server.
 
-    curl localhost:8080/?handd=true
+### Hpotter-app
+To clone and run hpotter-app, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) installed on your computer. From your command line:
 
-## Databases
-The default database is SQLite and requires no configuration. The tables
-are written into the default ("main.db") database.
+```bash
+# Clone this repository
+$ git clone https://github.com/sheet-t/HPotter
 
-If you'd like to use a different database, there are some environment
-variables that need setting.
+# Navigate to Hpotter-app
+$ cd hpotter-app
 
-HPOTTER\_DB -- the name of the database type, e.g.: "mysql".
-    Defaults to "sqlite".
+# Install Hpotter-app's dependencies
+$ npm install
 
-HPOTTER\_DB\_PASSWORD -- e.g.: "my-secret-pw".
-    Defaults to "".
+# Run the app
+$ npm start
+```
 
-HPOTTER\_DB\_HOST
-    Defaults to "127.0.0.1".
+## Credits
 
-HPOTTER\_DB\_PORT -- e.g.: 3306
-    Defaults to "".
+This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com.
 
-HPOTTER\_DB\_DB -- The database where the tables are placed e.g.: hpotter.
-Created if not present.  Defaults to "hpotter".
+## License
 
-## Directory structure
-hpotter/
-
-This is the main honeypot executable. It looks in plugins and runs all the
-plugins found there.
-
-plugins/
-
-This is where the protocol-specific plugins reside. They are based on
-https://docs.python.org/3/library/socketserver.html  The generic.py file is
-a good place to start for creating your own plugins.
-
-jsonserver/
-
-Where the SQL to JSON web server resides.    
-
-## Thanks
-This product includes GeoLite2 data created by MaxMind, available from
-<a href="https://www.maxmind.com">https://www.maxmind.com</a>.
+MIT
