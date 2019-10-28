@@ -19,6 +19,7 @@ class NetBuilder():
          ipam_pool = docker.types.IPAMPool(
                  subnet = ipr + '/16',
                  iprange = ipr + '/24',
+                 #leave gateway empty when constructing a network on localhost
                  gateway = gate,
                  aux_addresses = None
                  )
@@ -31,11 +32,8 @@ class NetBuilder():
                  ipam=ipam_config
                  )
 
-    def remove():
-         self.network.remove()
-
 #create network
-network = NetBuilder(name="Network_1", ipr='10.3.3.0', gate='10.3.3.254').network
+network = NetBuilder(name="network_1", ipr='127.0.0.1').network
 logger.info("Network: %s created", network.name)
 
 class Singletons():
