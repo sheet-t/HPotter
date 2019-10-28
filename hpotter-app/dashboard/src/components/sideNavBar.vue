@@ -12,7 +12,7 @@ p,<style scoped>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="title">
-            <v-img src="../assets/LogoTextWhite.png"></v-img>
+            <v-img src="../assets/LogoTextWhite.png">&nbsp;</v-img>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -26,7 +26,7 @@ p,<style scoped>
       <v-list-item-group v-model="item" color="white">
         <v-list-item
           v-for="(item, i) in items"
-          v-on:click="$emit('update:window' , i)" 
+          v-on:click="$emit('update:window' , i)"
           :key="i">
           <v-list-item-icon>
             <v-icon v-text="item.icon"></v-icon>
