@@ -37,7 +37,6 @@ export default{
       return this.$store.getters.active
     }
   },
-  // TODO: need to figure out why KPI info won't display
   props:['kpi']
 }
 </script>
