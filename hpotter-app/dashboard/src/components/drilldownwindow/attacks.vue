@@ -31,6 +31,13 @@
 
 <script>
 export default{
-    props:['valueAttacks' , 'labelsAttacks']
+  computed: {
+    valueAttacks() {
+      return this.$store.getters.valueAttacks
+    },
+    labelsAttacks() {
+      return this.$store.getters.labelsAttacks
+    }
   }
+}
 </script>
