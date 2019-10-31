@@ -33,7 +33,7 @@ class OneWayThread(threading.Thread):
         self.request_type = request_type
         self.limit = limit
         self.di = di
-
+        
         if self.table:
             self.connection = tables.Connections(
                 sourceIP=self.source.getsockname()[0],
@@ -41,7 +41,7 @@ class OneWayThread(threading.Thread):
                 destPort=self.dest.getsockname()[1],
                 proto=tables.TCP)
             write_db(self.connection)
-
+        
     def run(self):
         total = b''
         while 1:
@@ -52,7 +52,7 @@ class OneWayThread(threading.Thread):
                     pass
             except Exception:
                 break
-
+            
             if data == b'' or not data:
                 break
 
@@ -63,15 +63,20 @@ class OneWayThread(threading.Thread):
                 wrap_socket(lambda: self.dest.sendall(data))
             except Exception:
                 break
-
-            if len(total) >= self.limit > 0:
+            
+            if type(len(total)) != type(self.limit):
+                if (str(len(total)) >= self.limit > 0):
+                    break
+            elif (len(total) >= self.limit > 0):
                 break
 
         if self.table:
             if self.di:
                 total = self.di(total)
-            http = self.table(request_type=self.request_type, request=str(total), connection=self.connection)
-            write_db(http)
+            # Save this print statement for later debugging
+            # logger.info([(k, type(v)) for k,v in vars(self).items()])
+            self.request = tables.Requests(request_type=self.request_type, request=str(total), connection=self.connection)
+            write_db(self.request)
 
         self.source.close()
         self.dest.close()
@@ -123,14 +128,12 @@ class PipeThread(threading.Thread):
                 dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 dest.settimeout(30)
                 dest.connect(self.connect_address)
-
                 if self.request_type == '':
                     OneWayThread(source=source, dest=dest, table=self.table, limit=self.limit, di=self.di).start()
                 else:
                     OneWayThread(source=source, dest=dest, table=self.table,
                                  request_type=self.request_type, limit=self.limit, di=self.di).start()
-                OneWayThread(dest, source).start()
-
+            
             except OSError as exc:
                 dest.close()
                 source.close()

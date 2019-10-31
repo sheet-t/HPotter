@@ -142,6 +142,8 @@ def start_plugins():
                     rm_container()
                 return
 
+            di = lambda a: re.sub(b'([\x00-\x20]|[\x7f-xff])+', b' ', a)
+
             current_thread = PipeThread((plugin.listen_address, \
                 plugin.listen_port), (plugin.ports['connect_address'], \
                 plugin.ports['connect_port']), plugin.table, \
@@ -179,3 +181,4 @@ def stop_plugins():
         logger.info("--- removing %s container", item["plugin"].name)
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
+
