@@ -27,7 +27,7 @@
 <template>
   <v-app>
     <v-navigation-drawer floating app class="elevation-3 slateNav"><!--Left Sidebar-->
-      <sideNavBar v-on:update:window="updateWindow($event)"/>
+      <sideNavBar :window="window"/>
     </v-navigation-drawer> <!--End Sidebar-->
     <v-navigation-drawer floating right app width="300px" class="hiddenNav"><!--Right hand content-->
       <div class="mt-8">
@@ -39,7 +39,7 @@
         Activity
         </v-card-title>
         <v-card-text>
-          <v-sparkline :value="weekData" :labels='labelsWeek' line-width="10"  stroke-linecap='round' type='bars' show-labels smooth auto-draw></v-sparkline>
+          <v-sparkline :value="weekData" :labels="labelsWeek" line-width="10"  stroke-linecap="round" type="bars" show-labels smooth auto-draw></v-sparkline>
         </v-card-text>
       </v-card>
     </v-navigation-drawer>
@@ -52,11 +52,11 @@
               <!--Dashboard-->
               <v-window-item>
                 <v-row>
-                  <cards v-on:update:content="updateContent($event)" :kpi="kpi" :contentID="contentID" />
+                  <cards :kpi="kpi" :content="content" />
                 </v-row>
 
                 <v-row>
-                  <drillDownWindow :contentID="contentID" :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" :vectors="vectors"/>
+                  <drillDownWindow :content="content" :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" :vectors="vectors"/>
                 </v-row>
               </v-window-item>
 
@@ -102,62 +102,36 @@ export default {
     drillDownWindow
   },
   data: () => ({
-    window: 0,
-    kpi: [
-      { name: 'Attacks', value: '128', icon: 'mdi-knife-military', id: '1' },
-      { name: 'Attack Vectors', value: '6', icon: 'mdi-directions-fork', id: '2' },
-      { name: 'Creds Used', value: '29', icon: 'mdi-lock-open-outline', id: '3' },
-      { name: 'Countries', value: '5', icon: 'mdi-map-marker', id: '4' }
-    ],
-    viewDate: new Date().toISOString().substr(0, 10),
-    content: 1,
-    weekData: [7, 6, 4, 9, 8, 10, 1],
-    labelsWeek: [
-      'Mon',
-      'Tue',
-      'Wed',
-      'Thu',
-      'Fri',
-      'Sat',
-      'Sun',
-    ],
-
-      valueAttacks: [0, 2, 5, 9, 5, 10, 0, 5],
-      labelsAttacks: [
-        '12am',
-        '3am',
-        '6am',
-        '9am',
-        '12pm',
-        '3pm',
-        '6pm',
-        '9pm',
-      ],
-      vectors: [
-        { name: 'Telnet', port: 23, number: 3 },
-        { name: 'ssh', port: 22, number: 7 },
-        { name: 'Maria', port: 3306, number: 2 },
-        { name: 'http', port: 22, number: 0 },
-        { name: 'https', port: 443, number: 18 },
-        { name: 'maria_tls', port: 99, number: 4 }
-      ],
+    viewDate: new Date().toISOString().substr(0, 10)
   }),
-  methods: {
-    updateContent(value) {
-      return this.content = value
-    },
-    updateWindow(value) {
-      return this.window = value
-    }
-  },
+  methods: {},
   computed: {
-    contentID: {
-      get: function () {
-        return this.content
-      },
-      set: function () {
-        this.contentID = this.content
-      }
+    content() {
+      return this.$store.getters.content
+    },
+    window() {
+      return this.$store.getters.window
+    },
+    kpi() {
+      return this.$store.getters.kpi
+    },
+    viewDate() {
+      return this.$store.getters.viewDate
+    },
+    weekData() {
+      return this.$store.getters.weekData
+    },
+    labelsWeek() {
+      return this.$store.getters.labelsWeek
+    },
+    valueAttacks() {
+      return this.$store.getters.valueAttacks
+    },
+    labelsAttacks() {
+      return this.$store.getters.labelsAttacks
+    },
+    vectors() {
+      return this.$store.getters.vectors
     }
   },
 
