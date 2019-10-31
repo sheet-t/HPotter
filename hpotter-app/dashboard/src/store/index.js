@@ -14,7 +14,6 @@ export default new Vuex.Store({
             { name: 'Creds Used', value: '29', icon: 'mdi-lock-open-outline', id: '3' },
             { name: 'Countries', value: '5', icon: 'mdi-map-marker', id: '4' }
         ],
-        viewDate: new Date().toISOString().substr(0, 10),
         weekData: [7, 6, 4, 9, 8, 10, 1],
         labelsWeek: [
             'Mon',
@@ -57,9 +56,6 @@ export default new Vuex.Store({
         },
         kpi(state) {
             return state.kpi
-        },
-        viewDate(state) {
-            return state.viewDate
         },
         weekData(state) {
             return state.weekData
