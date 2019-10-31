@@ -33,7 +33,7 @@ class NetBuilder():
                  )
 
 #create network
-network = NetBuilder(name="network_1", ipr='127.0.0.1').network
+network = NetBuilder(name="network_1", ipr='10.0.0.0').network
 logger.info("Network: %s created", network.name)
 
 class Singletons():
