@@ -17,8 +17,8 @@ class NetBuilder():
         #set up IP range in a IPAM config for use in the network
          self.name = name
          ipam_pool = docker.types.IPAMPool(
-                 subnet = ipr + '/8',
-                 iprange = ipr + '/8',
+                 subnet = ipr + '/16',
+                 iprange = ipr + '/24',
                  #leave gateway empty when constructing a network on localhost
                  gateway = gate,
                  aux_addresses = None
@@ -33,7 +33,7 @@ class NetBuilder():
                  )
 
 #create network
-network = NetBuilder(name="network_1", ipr='10.0.0.0').network
+network = NetBuilder(name="network_1", ipr='10.3.3.0').network
 logger.info("Network: %s created", network.name)
 
 class Singletons():
