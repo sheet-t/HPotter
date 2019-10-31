@@ -101,7 +101,9 @@ export default {
     cards,
     drillDownWindow
   },
-  data: () => ({}),
+  data: () => ({
+    viewDate: new Date().toISOString().substr(0, 10)
+  }),
   methods: {},
   computed: {
     content() {
