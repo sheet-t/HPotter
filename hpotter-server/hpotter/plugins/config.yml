@@ -1,4 +1,29 @@
 ---
+name: https
+setup:
+    mkdir: ['apache2']
+teardown:
+    rmdir: ['apache2']
+container: 'httpd:latest'
+alt_container: 'arm32v6/httpd:alpine'
+read_only: True
+detach: True
+tls: True
+ports:
+    from: 80/tcp
+    connect_address: '127.0.0.1'
+    connect_port: 8090
+volumes:
+    apache2:
+        bind: /usr/local/apache2/logs
+        mode: rw
+environment: None
+listen_address: 0.0.0.0
+listen_port: 443
+table: Requests
+request_type: 'Web'
+capture_length: COMMAND_LENGTH
+--- 
 name: httpipe
 setup:
     mkdir: ['apache2']
@@ -44,31 +69,6 @@ listen_address: 0.0.0.0
 listen_port: 3306
 table: Requests
 request_type: 'SQL'
-capture_length: COMMAND_LENGTH
----
-name: https
-setup:
-    mkdir: ['apache2']
-teardown:
-    rmdir: ['apache2']
-container: 'httpd:latest'
-alt_container: 'arm32v6/httpd:alpine'
-read_only: True
-detach: True
-tls: True
-ports:
-    from: 443/tcp
-    connect_address: '127.0.0.3'
-    connect_port: 8090
-volumes:
-    apache2:
-        bind: /usr/local/apache2/logs
-        mode: rw
-environment: None
-listen_address: 0.0.0.0
-listen_port: 443
-table: Requests
-request_type: 'Web'
 capture_length: COMMAND_LENGTH
 ---
 name: mariadb_tls

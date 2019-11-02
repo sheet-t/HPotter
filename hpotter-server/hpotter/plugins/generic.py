@@ -65,9 +65,10 @@ class OneWayThread(threading.Thread):
                 break
             
             if type(len(total)) != type(self.limit):
-                if (str(len(total)) >= self.limit > 0):
+                self.limit = 4096
+                if len(total) >= (self.limit) > 0:
                     break
-            elif (len(total) >= self.limit > 0):
+            elif len(total) >= self.limit > 0:
                 break
 
         if self.table:
@@ -102,20 +103,18 @@ class PipeThread(threading.Thread):
         source_socket.bind(self.bind_address)
         source_socket.listen()
     
-        internal_count = 0
-
         while True:
             try:
                 source = None
                 try:
-                    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                    context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
-
                     source, address = source_socket.accept()
+                    print("accepted, source =  " + str(source) + ", address = " + str(address))
+                    print("self.tls:", self.tls)
                     if self.tls:
+                        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                        context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
                         source = context.wrap_socket(source, server_side=True)
                 except socket.timeout:
-                    internal_count = internal_count + 1
                     if self.shutdown_requested:
                         logger.info('Shutdown requested')
                         if source:
@@ -126,14 +125,21 @@ class PipeThread(threading.Thread):
                         continue
 
                 dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                print("dest = " + str(dest))
                 dest.settimeout(30)
+                print("self.connect_address = " + str(self.connect_address))
                 dest.connect(self.connect_address)
+                print("dest = " + str(dest))
+
                 if self.request_type == '':
-                    OneWayThread(source=source, dest=dest, table=self.table, limit=self.limit, di=self.di).start()
+                    OneWayThread(source=source, dest=dest, table=self.table,
+                        limit=self.limit, di=self.di).start()
                 else:
                     OneWayThread(source=source, dest=dest, table=self.table,
-                                 request_type=self.request_type, limit=self.limit, di=self.di).start()
-            
+                         request_type=self.request_type, limit=self.limit,
+                         di=self.di).start()
+                OneWayThread(dest, source).start()
+
             except OSError as exc:
                 dest.close()
                 source.close()
