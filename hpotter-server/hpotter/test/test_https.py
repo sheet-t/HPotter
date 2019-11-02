@@ -1,20 +1,23 @@
-import ssl, socket, requests
+import re
+import requests
+from requests.exceptions import ConnectionError
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 hostname = '127.0.0.1'
 data = b'test'
-url = 'http://127.0.0.1'
+url = 'https://127.0.0.1'
 
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+try:
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
-    with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-        
-        response = requests.post(url, data=data, verify='cert.pem')
-        if response:
-            print("Received:\t", response.content.decode('utf-8'))
-            ssock.close()
-            sock.close()
-        else:
-            print("no response received")
+	response = requests.post(url, data=data, verify=False)
 
-        
+	resp = re.sub('<[^<]+?>', '', response.content.decode('utf-8'))
+
+	if response.status_code == 200:
+		print("Response [{}]".format(response.status_code))
+		print(resp)
+	else:
+		print("no response received")
+except (Exception, ConnectionError) as exc:
+	print("Is HPotter running?\n{}".format(exc))
