@@ -8,12 +8,17 @@ export default new Vuex.Store({
         active: 1,
         window: 0,
         content: 1,
+        connections: [],
+        requests: [],
+        credentials: [],
+        locals: [],
         kpi: [
             { name: 'Attacks', value: '128', icon: 'mdi-knife-military', id: '1' },
             { name: 'Attack Vectors', value: '6', icon: 'mdi-directions-fork', id: '2' },
             { name: 'Creds Used', value: '29', icon: 'mdi-lock-open-outline', id: '3' },
             { name: 'Countries', value: '5', icon: 'mdi-map-marker', id: '4' }
         ],
+        viewDate: new Date().toISOString().substr(0, 10),
         weekData: [7, 6, 4, 9, 8, 10, 1],
         labelsWeek: [
             'Mon',
@@ -45,6 +50,18 @@ export default new Vuex.Store({
         ]
     },
     getters: {
+        connections(state) {
+          return state.connections
+        },
+        requests(state) {
+          return state.requests
+        },
+        credentials(state) {
+          return state.credentials
+        },
+        locals(state) {
+          return state.locals
+        },
         active(state) {
             return state.active
         },
@@ -56,6 +73,9 @@ export default new Vuex.Store({
         },
         kpi(state) {
             return state.kpi
+        },
+        viewDate(state) {
+            return state.viewDate
         },
         weekData(state) {
             return state.weekData
@@ -74,6 +94,18 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        SET_CONNECTIONS(state, value) {
+          state.connections = value
+        },
+        SET_REQUESTS(state, value) {
+          state.requests = value
+        },
+        SET_CREDENTIALS(state, value) {
+          state.credentials = value
+        },
+        SET_LOCALS(state, value) {
+          state.locals = value
+        },
         updateActive(state, value) {
             state.active = value
         },
@@ -85,6 +117,30 @@ export default new Vuex.Store({
         }
     },
     actions: {
+        SET_CONNECTIONS: async (context) => {
+          let { data } = fetch ('http://localhost:8000/connections')
+          if ( data.status == 200) {
+            context.dispatch('SET_CONNECTIONS', data.json())
+          }
+        },
+        SET_REQUESTS: async (context) => {
+          let { data } = fetch ('http://localhost:8000/requests')
+          if ( data.status == 200) {
+            context.dispatch('SET_REQUESTS', data.json())
+          }
+        },
+        SET_CREDENTIALS: async (context) => {
+          let { data } = fetch ('http://localhost:8000/credentials')
+          if ( data.status == 200) {
+            context.dispatch('SET_CREDENTIALS', data.json())
+          }
+        },
+        SET_LOCALS: async (context) => {
+          let { data } = fetch ('http://localhost:8000/connections?geoip=1')
+          if ( data.status == 200) {
+            context.dispatch('SET_LOCALS', data.json())
+          }
+        },
         updateActive(context, value) {
             context.commit('updateActive', value)
         },
