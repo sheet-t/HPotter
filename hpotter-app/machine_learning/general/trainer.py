@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 tf.logging.set_verbosity(tf.logging.FATAL)
-from machine_learning.general.helpers import print_progress
+from machine_learning.general.helpers.helper import print_progress
 
 
 class Trainer:
@@ -13,7 +13,7 @@ class Trainer:
         self.path_to_graph = checkpoints_path + "rnn_checkpoint"
         self.dropout = dropout
 
-    def train(self, model, training_data, training_data_size, num_steps, num_epochs, min_loss=0.35):
+    def train(self, model, training_data, training_data_size, num_steps, num_epochs, min_loss=0.09):
         tf.set_random_seed(1234)
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())

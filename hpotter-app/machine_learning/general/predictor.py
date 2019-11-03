@@ -65,8 +65,8 @@ class Predictor:
             preds.extend(pred)
 
             if visual and num_displayed < num_to_display and pred == [1]:
-                print('\r\n\r\nPrediction: ', pred[0])
-                print('\r\nLoss: ', batch_loss[0])
+                # print('\r\n\r\nPrediction: ', pred[0])
+                # print('\r\nLoss: ', batch_loss[0])
                 num_displayed += 1
                 self._visualize(alphas=alphas, X=seq)
             if write_to_json and pred == [1]:
@@ -89,11 +89,12 @@ class Predictor:
                 json_handle.write(json.dumps(alphas_dict, indent=4))
         return preds, losses
 
-    def write_header(self):
-        title = 'Detected HTTP Anomalies'
+    def write_header(self, title):
+        title = 'Detected %s Anomalies' % str(title)
         title_wrapper = self._html_tag('title')
         heading_wrapper = self._html_tag('h1')
-        with open('hpotter/machine_learning/http_commands/anomaly_report.html', 'a+') as anomaly_report:
+        with open('/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html',
+                  'a+') as anomaly_report:
             anomaly_report.write(title_wrapper(title) + heading_wrapper(title))
 
     def _predict_for_request(self, X, loss):
@@ -149,5 +150,5 @@ class Predictor:
                     else:
                         message += token
             message += newline_wrapper() * 2
-        with open('machine_learning/http_commands/anomaly_report.html', 'a+') as anomaly_report:
+        with open('/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html', 'a+') as anomaly_report:
             anomaly_report.write(message)
