@@ -58,7 +58,7 @@ container: 'mariadb:latest'
 alt_container: 'apcheamitru/arm32v6-mariadb:latest'
 read_only: True
 detach: True
-tls: True
+tls: False
 ports:
     from: 3306/tcp
     connect_address: '127.0.0.2'
