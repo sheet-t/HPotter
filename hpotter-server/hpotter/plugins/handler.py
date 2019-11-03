@@ -5,36 +5,10 @@ import re
 import sys
 import subprocess
 import yaml
-import threading
 
 from hpotter.env import logger
 from hpotter.plugins.generic import PipeThread
 from hpotter.plugins import ssh, telnet
-
-client = docker.from_env()
-class NetBuilder():
-    def __init__(self, name=None, ipr=None, gate=None):
-        #set up IP range in a IPAM config for use in the network
-         self.name = name
-         ipam_pool = docker.types.IPAMPool(
-                 subnet = ipr + '/16',
-                 iprange = ipr + '/24',
-                 #leave gateway empty when constructing a network on localhost
-                 gateway = gate,
-                 aux_addresses = None
-                 )
-         ipam_config = docker.types.IPAMConfig(
-                 pool_configs=[ipam_pool]
-                 )
-         self.network = client.networks.create(
-                 name=name,
-                 driver="bridge",
-                 ipam=ipam_config
-                 )
-
-#create network
-network = NetBuilder(name="network_1", ipr='10.3.3.0').network
-logger.info("Network: %s created", network.name)
 
 class Singletons():
     active_plugins = {}
@@ -115,7 +89,6 @@ class Plugin(yaml.YAMLObject):
                 plugins.append(p)
         return plugins
 
-
 def start_plugins():
     #ensure Docker is running
     try:
@@ -130,10 +103,11 @@ def start_plugins():
     all_plugins = Plugin.read_in_all_plugins()
     current_thread = None
     current_container = None
-
     for plugin in all_plugins:
         if plugin is not None:
             try:
+                client = docker.from_env()
+
                 container = plugin.container
                 if platform.machine() == 'armv6l' :
                     container = plugin.alt_container
@@ -159,8 +133,7 @@ def start_plugins():
                         read_only=True)
 
                 logger.info('Created: %s', plugin.name)
-                network.connect(current_container)
-                logger.info('Connected %s to %s network', plugin.name, network.name)
+
             except OSError as err:
 
                 logger.info(err)
@@ -202,21 +175,10 @@ def stop_plugins():
         except OSError as error:
             logger.info(name + ": " + str(error))
             return
+
         if item["container"] is not None:
             item["thread"].request_shutdown()
         logger.info("--- removing %s container", item["plugin"].name)
-        network.disconnect(item["container"].name, True)
-        network.reload()
-
-        #avoid race conditions between singletons
-        lock = threading.Lock()
-        lock.acquire()
-
-        #remove network once all containers are disconnected
-        if not network.containers:
-            network.remove()
-            logger.info("--- network removed")
-            lock.release()
-        logger.info("--- %s container disconnected from %s", item["plugin"].name, network.name)
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
+
