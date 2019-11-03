@@ -118,28 +118,24 @@ export default new Vuex.Store({
     },
     actions: {
         SET_CONNECTIONS: async (context) => {
-          let { data } = fetch ('http://localhost:8000/connections')
-          if ( data.status == 200) {
-            context.dispatch('SET_CONNECTIONS', data.json())
-          }
+          let data = fetch ('http://localhost:8000/connections')
+          let resp = data.then(response => { return response.json() })
+          resp.then(connections => {context.commit('SET_CONNECTIONS', connections)})
         },
         SET_REQUESTS: async (context) => {
-          let { data } = fetch ('http://localhost:8000/requests')
-          if ( data.status == 200) {
-            context.dispatch('SET_REQUESTS', data.json())
-          }
+          let data = fetch ('http://localhost:8000/requests')
+          let resp = data.then(response => { return response.json() })
+          resp.then(connections => { context.commit('SET_REQUESTS', connections)})
         },
         SET_CREDENTIALS: async (context) => {
-          let { data } = fetch ('http://localhost:8000/credentials')
-          if ( data.status == 200) {
-            context.dispatch('SET_CREDENTIALS', data.json())
-          }
+          let data = fetch ('http://localhost:8000/credentials')
+          let resp = data.then(response => { return response.json() })
+          resp.then(connections => {context.commit('SET_CREDENTIALS', connections)})
         },
         SET_LOCALS: async (context) => {
-          let { data } = fetch ('http://localhost:8000/connections?geoip=1')
-          if ( data.status == 200) {
-            context.dispatch('SET_LOCALS', data.json())
-          }
+          let data = fetch ('http://localhost:8000/connections?geoip=1')
+          let resp = data.then(response => { return response.json() })
+          resp.then(connections => {context.commit('SET_LOCALS', connections)})
         },
         updateActive(context, value) {
             context.commit('updateActive', value)
