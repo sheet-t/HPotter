@@ -2,9 +2,9 @@ import random
 
 from sklearn.model_selection import train_test_split
 
-from machine_learning.http_commands.helpers.helper import get_requests_from_file, batch_generator, \
+from machine_learning.general.helpers.helper import get_requests_from_file, batch_generator, \
     single_generator
-from machine_learning.http_commands.helpers.vocabulary import Vocabulary
+from machine_learning.general.helpers.vocabulary import Vocabulary
 
 
 class Reader(object):
