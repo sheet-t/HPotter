@@ -3,7 +3,6 @@ import threading
 
 from hpotter import tables
 from hpotter.env import logger, write_db
-import hpotter.plugins.handler as plugins
 
 # remember to put name in __init__.py
 
