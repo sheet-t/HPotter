@@ -108,8 +108,6 @@ class PipeThread(threading.Thread):
                 source = None
                 try:
                     source, address = source_socket.accept()
-                    print("accepted, source =  " + str(source) + ", address = " + str(address))
-                    print("self.tls:", self.tls)
                     if self.tls:
                         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                         context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
@@ -125,11 +123,8 @@ class PipeThread(threading.Thread):
                         continue
 
                 dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print("dest = " + str(dest))
                 dest.settimeout(30)
-                print("self.connect_address = " + str(self.connect_address))
                 dest.connect(self.connect_address)
-                print("dest = " + str(dest))
 
                 if self.request_type == '':
                     OneWayThread(source=source, dest=dest, table=self.table,
@@ -138,7 +133,6 @@ class PipeThread(threading.Thread):
                     OneWayThread(source=source, dest=dest, table=self.table,
                          request_type=self.request_type, limit=self.limit,
                          di=self.di).start()
-                OneWayThread(dest, source).start()
 
             except OSError as exc:
                 dest.close()
