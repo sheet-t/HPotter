@@ -46,7 +46,7 @@ class TestTelnet(unittest.TestCase):
         client = docker.from_env()
         test = client.containers.list()
         if test:
-            subprocess.call('docker stop $(docker ps)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.call('docker stop $(docker ps -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.call('docker rm $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
             pass
