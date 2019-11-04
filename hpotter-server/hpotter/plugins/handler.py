@@ -17,7 +17,7 @@ class NetBuilder():
         #set up IP range in a IPAM config for use in the network
          self.name = name
          ipam_pool = docker.types.IPAMPool(
-                 subnet = ipr + '/16',
+                 subnet = ipr + '/24',
                  iprange = ipr + '/24',
                  #leave gateway empty when constructing a network on localhost
                  gateway = gate,
