@@ -132,6 +132,7 @@ class PipeThread(threading.Thread):
                     OneWayThread(source=source, dest=dest, table=self.table,
                          request_type=self.request_type, limit=self.limit,
                          di=self.di).start()
+                OneWayThread(dest, source).start()
 
             except OSError as exc:
                 dest.close()
