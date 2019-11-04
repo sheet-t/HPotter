@@ -8,26 +8,26 @@ export default new Vuex.Store({
         active: 1,
         window: 0,
         content: 1,
-        connections: [],
         requests: [],
         credentials: [],
         locals: [],
         kpi: [
-            { name: 'Attacks', value: '128', icon: 'mdi-knife-military', id: '1' },
-            { name: 'Attack Vectors', value: '6', icon: 'mdi-directions-fork', id: '2' },
-            { name: 'Creds Used', value: '29', icon: 'mdi-lock-open-outline', id: '3' },
-            { name: 'Countries', value: '5', icon: 'mdi-map-marker', id: '4' }
+            { name: 'Attacks', value: 'None', icon: 'mdi-knife-military', id: '1' },
+            { name: 'Attack Vectors', value: 'None', icon: 'mdi-directions-fork', id: '2' },
+            { name: 'Creds Used', value: 'None', icon: 'mdi-lock-open-outline', id: '3' },
+            { name: 'Countries', value: 'None', icon: 'mdi-map-marker', id: '4' }
         ],
+        date: new Date(),
         viewDate: new Date().toISOString().substr(0, 10),
         weekData: [7, 6, 4, 9, 8, 10, 1],
         labelsWeek: [
+            'Sun',
             'Mon',
             'Tue',
             'Wed',
             'Thu',
             'Fri',
-            'Sat',
-            'Sun'
+            'Sat'
         ],
         valueAttacks: [0, 2, 5, 9, 5, 10, 0, 5],
         labelsAttacks: [
@@ -41,18 +41,15 @@ export default new Vuex.Store({
             '9pm'
         ],
         vectors: [
-            { name: 'Telnet', port: 23, number: 3 },
-            { name: 'ssh', port: 22, number: 7 },
-            { name: 'Maria', port: 3306, number: 2 },
+            { name: 'Telnet', port: 23, number: 0 },
+            { name: 'ssh', port: 22, number: 0 },
+            { name: 'Maria', port: 3306, number: 0 },
             { name: 'http', port: 22, number: 0 },
-            { name: 'https', port: 443, number: 18 },
-            { name: 'maria_tls', port: 99, number: 4 }
+            { name: 'https', port: 443, number: 0 },
+            { name: 'maria_tls', port: 99, number: 0 }
         ]
     },
     getters: {
-        connections(state) {
-          return state.connections
-        },
         requests(state) {
           return state.requests
         },
@@ -94,17 +91,114 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        SET_CONNECTIONS(state, value) {
-          state.connections = value
+        SET_CONNECTIONS(state, promise) {
+          var attacks = [0, 0, 0, 0, 0, 0, 0, 0]
+          var days = [0, 0, 0, 0, 0, 0, 0]
+
+          var current = 0
+
+          var sshhttp = 0
+          var telnet = 0
+          var maria = 0
+          var https = 0
+          var mariatls = 0
+
+          promise.json().then( data => {
+            for (const conn of data) {
+              var connDay = new Date(conn["created_at"])
+              var year = connDay.getFullYear()
+              var month = connDay.getMonth()
+              var day = connDay.getDate()
+              var hour = connDay.getHours()
+              var dow = connDay.getDay()
+              switch (true) {
+                case (hour < 3):
+                  attacks[0] = attacks[0] + 1
+                  break
+                case ((hour >= 3) && (hour < 9)):
+                  attacks[1] = attacks[1] + 1
+                  break
+                case ((hour >= 9) && (hour < 12)):
+                  attacks[2] = attacks[2] + 1
+                  break
+                case ((hour >= 12) && (hour < 15)):
+                  attacks[3] = attacks[3] + 1
+                  break
+                case ((hour >= 15) && (hour < 18)):
+                  attacks[4] = attacks[4] + 1
+                  break
+                case ((hour >= 18) && (hour < 21)):
+                  attacks[5] = attacks[5] + 1
+                  break
+                case ((hour >= 21) && (hour < 24)):
+                  attacks[6] = attacks[6] + 1
+                  break
+                default:
+                  attacks[7] = attacks[7] + 1
+                  break
+              }
+
+              switch (conn["destPort"]) {
+                case 22:
+                  sshhttp = 1
+                  state.vectors[1]['number'] = state.vectors[1]['number'] + 1
+                  state.vectors[3]['number'] = state.vectors[3]['number'] + 1
+                  break
+                case 23:
+                  telnet = 1
+                  state.vectors[0]['number'] = state.vectors[0]['number'] + 1
+                  break
+                case 3306:
+                  maria = 1
+                  state.vectors[2]['number'] = state.vectors[2]['number'] + 1
+                  break
+                case 443:
+                  https = 1
+                  state.vectors[4]['number'] = state.vectors[4]['number'] + 1
+                  break
+                case 99:
+                  mariatls = 1
+                  state.vectors[5]['number'] = state.vectors[5]['number'] + 1
+                  break
+                default:
+                  break
+              }
+
+              if ((year == state.date.getFullYear()) && (month == state.date.getMonth())) {
+                if (day == state.date.getDate()){
+                  current = current + 1
+                }
+                days[dow] = days[dow] + 1
+              }
+
+            }
+            state.kpi[0]['value'] = current
+            state.valueAttacks = attacks
+            state.weekData = days
+            state.kpi[1]['value'] = sshhttp + telnet + maria + https + mariatls
+          })
         },
-        SET_REQUESTS(state, value) {
-          state.requests = value
+        SET_REQUESTS(state, promise) {
+          promise.json().then( data =>
+            state.requests = data
+          )
         },
-        SET_CREDENTIALS(state, value) {
-          state.credentials = value
+        SET_CREDENTIALS(state, promise) {
+          promise.json().then( data => {
+            state.kpi[2]['value'] = data.length
+          })
         },
-        SET_LOCALS(state, value) {
-          state.locals = value
+        SET_LOCALS(state, promise) {
+          var locs = []
+          var count = 0
+          promise.json().then( data => {
+            for (const item of data) {
+              locs.push(item['geometry']['coordinates'])
+              count = count + 1
+            }
+            state.kpi[3]['value'] = count
+            state.locals = locs
+          })
         },
         updateActive(state, value) {
             state.active = value
@@ -118,24 +212,24 @@ export default new Vuex.Store({
     },
     actions: {
         SET_CONNECTIONS: async (context) => {
-          let data = fetch ('http://localhost:8000/connections')
-          let resp = data.then(response => { return response.json() })
-          resp.then(connections => {context.commit('SET_CONNECTIONS', connections)})
+          fetch('http://localhost:8000/connections').then( response => {
+            context.commit('SET_CONNECTIONS', response)
+          })
         },
         SET_REQUESTS: async (context) => {
-          let data = fetch ('http://localhost:8000/requests')
-          let resp = data.then(response => { return response.json() })
-          resp.then(connections => { context.commit('SET_REQUESTS', connections)})
+          fetch ('http://localhost:8000/requests').then( response => {
+            context.commit('SET_REQUESTS', response)
+          })
         },
         SET_CREDENTIALS: async (context) => {
-          let data = fetch ('http://localhost:8000/credentials')
-          let resp = data.then(response => { return response.json() })
-          resp.then(connections => {context.commit('SET_CREDENTIALS', connections)})
+          fetch ('http://localhost:8000/credentials').then( response => {
+            context.commit('SET_REQUESTS', response)
+          })
         },
         SET_LOCALS: async (context) => {
-          let data = fetch ('http://localhost:8000/connections?geoip=1')
-          let resp = data.then(response => { return response.json() })
-          resp.then(connections => {context.commit('SET_LOCALS', connections)})
+          fetch ('http://localhost:8000/connections?geoip=1').then( response => {
+            context.commit('SET_REQUESTS', response)
+          })
         },
         updateActive(context, value) {
             context.commit('updateActive', value)
