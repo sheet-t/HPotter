@@ -95,8 +95,6 @@ export default new Vuex.Store({
           var attacks = [0, 0, 0, 0, 0, 0, 0, 0]
           var days = [0, 0, 0, 0, 0, 0, 0]
 
-          var current = 0
-
           var sshhttp = 0
           var telnet = 0
           var maria = 0
@@ -165,14 +163,14 @@ export default new Vuex.Store({
               }
 
               if ((year == state.date.getFullYear()) && (month == state.date.getMonth())) {
-                if (day == state.date.getDate()){
-                  current = current + 1
+                if ((day - state.date.getDate()) >= (0 - state.date.getDay()) && (day - state.date.getDate()) < (6 - state.date.getDay())) {
+                    days[dow] = days[dow] + 1
                 }
-                days[dow] = days[dow] + 1
+
               }
 
             }
-            state.kpi[0]['value'] = current
+            state.kpi[0]['value'] = days[state.date.getDay()]
             state.valueAttacks = attacks
             state.weekData = days
             state.kpi[1]['value'] = sshhttp + telnet + maria + https + mariatls
