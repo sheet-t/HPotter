@@ -10,6 +10,34 @@ from hpotter.env import logger
 from hpotter.plugins.generic import PipeThread
 from hpotter.plugins import ssh, telnet
 
+<<<<<<< HEAD
+=======
+client = docker.from_env()
+class NetBuilder():
+    def __init__(self, name=None, ipr=None, gate=None):
+        #set up IP range in a IPAM config for use in the network
+         self.name = name
+         ipam_pool = docker.types.IPAMPool(
+                 subnet = ipr + '/24',
+                 iprange = ipr + '/24',
+                 #leave gateway empty when constructing a network on localhost
+                 gateway = gate,
+                 aux_addresses = None
+                 )
+         ipam_config = docker.types.IPAMConfig(
+                 pool_configs=[ipam_pool]
+                 )
+         self.network = client.networks.create(
+                 name=name,
+                 driver="bridge",
+                 ipam=ipam_config
+                 )
+
+#create network
+network = NetBuilder(name="network_1", ipr='10.3.3.0').network
+logger.info("Network: %s created", network.name)
+
+>>>>>>> fixed netmask
 class Singletons():
     active_plugins = {}
 
