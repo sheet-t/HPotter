@@ -104,8 +104,22 @@ export default {
   data: () => ({
     viewDate: new Date().toISOString().substr(0, 10)
   }),
-  methods: {},
+  methods: {
+
+  },
   computed: {
+    loadconnections() {
+      return this.$store.getters.connections
+    },
+    loadrequests() {
+      return this.$store.getters.requests
+    },
+    loadcredentials() {
+      return this.$store.getters.credentials
+    },
+    loadlocals() {
+      return this.$store.getters.locals
+    },
     content() {
       return this.$store.getters.content
     },
@@ -136,6 +150,10 @@ export default {
   },
 
   created () {
+    this.$store.dispatch('SET_CONNECTIONS')
+    this.$store.dispatch('SET_REQUESTS')
+    this.$store.dispatch('SET_CREDENTIALS')
+    this.$store.dispatch('SET_LOCALS')
     this.$vuetify.theme.dark = true
   },
 };

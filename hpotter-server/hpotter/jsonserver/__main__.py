@@ -85,7 +85,7 @@ class JSONHandler(SimpleHTTPRequestHandler):
         data = {
             "type": "Feature",
             "geometry": {
-                "type": "MultiPoint", 
+                "type": "MultiPoint",
                 "coordinates": coordinates
             }
         }
