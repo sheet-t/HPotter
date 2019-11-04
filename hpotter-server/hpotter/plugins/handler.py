@@ -49,7 +49,7 @@ class Plugin(yaml.YAMLObject):
     @staticmethod
     def read_in_plugins(container_name):
         present = False
-        with open('hpotter/plugins/container-configuration.yml') as file:
+        with open('hpotter/plugins/config.yml') as file:
             for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
                 if (data["name"] == container_name):
                     present = True
@@ -74,7 +74,7 @@ class Plugin(yaml.YAMLObject):
     @staticmethod
     def read_in_all_plugins():
         plugins = []
-        with open('hpotter/plugins/container-configuration.yml') as file:
+        with open('hpotter/plugins/config.yml') as file:
             for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
                 p = Plugin(name=data['name'], setup=data['setup'], \
                           teardown=data['teardown'], container=data['container'], \
@@ -143,11 +143,11 @@ def start_plugins():
                 return
 
             di = lambda a: re.sub(b'([\x00-\x20]|[\x7f-xff])+', b' ', a)
-
+            
             current_thread = PipeThread((plugin.listen_address, \
                 plugin.listen_port), (plugin.ports['connect_address'], \
                 plugin.ports['connect_port']), plugin.table, \
-                plugin.capture_length, request_type=plugin.request_type)
+                plugin.capture_length, request_type=plugin.request_type, tls=plugin.tls)
 
             current_thread.start()
             p_dict = {
@@ -181,4 +181,3 @@ def stop_plugins():
         logger.info("--- removing %s container", item["plugin"].name)
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
-
