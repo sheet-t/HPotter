@@ -17,7 +17,7 @@ class TestPluginHandler(unittest.TestCase):
         stop_plugins()
         test = client.containers.list()
         self.assertFalse(test)
-        subprocess.call('docker container stop $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.call('docker stop $(docker ps -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.call('docker rm $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def test_read_in_plugins(self):
