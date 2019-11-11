@@ -6,7 +6,7 @@
   <v-container class="pt-0 mt-0">
     <v-layout row wrap>
       <v-flex xs3 v-for="stat in kpi" :key="stat.id">
-        <statcard :kpi="stat" v-on:update:content="$emit('update:content', stat.id)" :active="contentID == stat.id"/>
+        <statcard :kpi="stat" v-on:update:content="updateContent(stat.id)" :active="active"/>
       </v-flex>
     </v-layout>
   </v-container>
@@ -16,17 +16,25 @@
   import statcard from './cards/statcard';
 
   export default {
-    data() {
-      return {
-
-      }
-    },
     components: {
       statcard,
     },
-    created(){
-      this.$emit('update:content', "1")
+    computed: {
+      content() {
+        return this.$store.getters.content
+      },
+      kpi() {
+        return this.$store.getters.kpi
+      },
+      active() {
+        return this.$store.getters.active
+      }
     },
-    props:['kpi', 'contentID'],
+    methods: {
+      updateContent(content) {
+        this.$store.dispatch('updateContent', content)
+        this.$store.dispatch('updateActive', content)
+      }
+    }
   }
 </script>

@@ -5,11 +5,55 @@
       <div class="display-1 font-weight-thin  text-center">Map</div>
     </v-card-text>
     <v-card-text>
-      <!-- PLACEHOLDER JUST RANDOM MAP FROM WEB -->
-      <img src = "http://www.outline-world-map.com/map-images-original/blank-thin-white-transparent-world-map-b2a.png" width="600"></img>
+        <l-map
+          style="height: 500px; width: 100%"
+          :zoom="zoom"
+          :center="center"
+          @update:zoom="zoomUpdated"
+          @update:center="centerUpdated"
+          @update:bounds="boundsUpdated"
+        >
+          <l-tile-layer :url="url"></l-tile-layer>
+          <l-marker v-for="marker in coords" :lat-lng="marker"></l-marker>
+        </l-map>
     </v-card-text>
   </v-card>
 </template>
 
 
-<script></script>
+<script>
+import {LMap, LTileLayer, LMarker } from 'vue2-leaflet';
+
+export default {
+    name: 'MyAwesomeMap',
+    components: {
+        LMap,
+        LTileLayer,
+        LMarker
+    },
+
+  data () {
+    return {
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      zoom: 1,
+      center: [0, 0],
+      bounds: null,
+      coords: [
+        [47.313220, -1.319482],
+        [-48.313220, -1.319482]
+      ],
+    };
+  },
+  methods: {
+    zoomUpdated (zoom) {
+      this.zoom = zoom;
+    },
+    centerUpdated (center) {
+      this.center = center;
+    },
+    boundsUpdated (bounds) {
+      this.bounds = bounds;
+    }
+  }
+}
+</script>

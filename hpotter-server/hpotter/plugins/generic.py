@@ -32,7 +32,7 @@ class OneWayThread(threading.Thread):
         self.request_type = request_type
         self.limit = limit
         self.di = di
-
+        
         if self.table:
             self.connection = tables.Connections(
                 sourceIP=self.source.getsockname()[0],
@@ -40,7 +40,7 @@ class OneWayThread(threading.Thread):
                 destPort=self.dest.getsockname()[1],
                 proto=tables.TCP)
             write_db(self.connection)
-
+        
     def run(self):
         total = b''
         while 1:
@@ -51,7 +51,7 @@ class OneWayThread(threading.Thread):
                     pass
             except Exception:
                 break
-
+            
             if data == b'' or not data:
                 break
 
@@ -62,22 +62,28 @@ class OneWayThread(threading.Thread):
                 wrap_socket(lambda: self.dest.sendall(data))
             except Exception:
                 break
-
-            if len(total) >= self.limit > 0:
+            
+            if type(len(total)) != type(self.limit):
+                self.limit = 4096
+                if len(total) >= (self.limit) > 0:
+                    break
+            elif len(total) >= self.limit > 0:
                 break
 
         if self.table:
             if self.di:
                 total = self.di(total)
-            http = self.table(request_type=self.request_type, request=str(total), connection=self.connection)
-            write_db(http)
+            # Save this print statement for later debugging
+            # logger.info([(k, type(v)) for k,v in vars(self).items()])
+            self.request = tables.Requests(request_type=self.request_type, request=str(total), connection=self.connection)
+            write_db(self.request)
 
         self.source.close()
         self.dest.close()
 
 
 class PipeThread(threading.Thread):
-    def __init__(self, bind_address, connect_address, table, limit, request_type='', di=None):
+    def __init__(self, bind_address, connect_address, table, limit, request_type='', di=None, tls=False):
         super().__init__()
         self.bind_address = bind_address
         self.connect_address = connect_address
@@ -85,6 +91,7 @@ class PipeThread(threading.Thread):
         self.request_type = request_type
         self.limit = limit
         self.di = di
+        self.tls = tls
 
         self.shutdown_requested = False
 
@@ -94,20 +101,17 @@ class PipeThread(threading.Thread):
         source_socket.settimeout(5)
         source_socket.bind(self.bind_address)
         source_socket.listen()
-        TLS = False         # will pivot from plugin.py     ##TO-DO HPOT_45
-        internal_count = 0
-
+    
         while True:
             try:
                 source = None
                 try:
                     source, address = source_socket.accept()
-                    if TLS:
+                    if self.tls:
                         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                         context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
-                        source = context.wrap_context(source, server_side=True)
+                        source = context.wrap_socket(source, server_side=True)
                 except socket.timeout:
-                    internal_count = internal_count + 1
                     if self.shutdown_requested:
                         logger.info('Shutdown requested')
                         if source:
@@ -122,10 +126,12 @@ class PipeThread(threading.Thread):
                 dest.connect(self.connect_address)
 
                 if self.request_type == '':
-                    OneWayThread(source=source, dest=dest, table=self.table, limit=self.limit, di=self.di).start()
+                    OneWayThread(source=source, dest=dest, table=self.table,
+                        limit=self.limit, di=self.di).start()
                 else:
                     OneWayThread(source=source, dest=dest, table=self.table,
-                                 request_type=self.request_type, limit=self.limit, di=self.di).start()
+                         request_type=self.request_type, limit=self.limit,
+                         di=self.di).start()
                 OneWayThread(dest, source).start()
 
             except OSError as exc:

@@ -85,7 +85,7 @@ class JSONHandler(SimpleHTTPRequestHandler):
         data = {
             "type": "Feature",
             "geometry": {
-                "type": "MultiPoint", 
+                "type": "MultiPoint",
                 "coordinates": coordinates
             }
         }
@@ -184,7 +184,7 @@ class JSONHandler(SimpleHTTPRequestHandler):
             self.wfile.write(dump.encode())
 
 try:
-    os.chdir('hpotter/dashboard')
+    # os.chdir('hpotter/dashboard')
     server = HTTPServer(('', jsonserverport), JSONHandler)
     server.serve_forever()
 
