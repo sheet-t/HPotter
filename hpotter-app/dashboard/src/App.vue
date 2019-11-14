@@ -39,7 +39,7 @@
         Activity
         </v-card-title>
         <v-card-text>
-          <v-sparkline :value="weekData" :labels="labelsWeek" line-width="10"  stroke-linecap="round" type="bars" show-labels smooth auto-draw></v-sparkline>
+          <v-sparkline :value="weekData" :labels="labelsWeek" line-width="10"  stroke-linecap="round" type="bars" color="white" show-labels smooth auto-draw></v-sparkline>
         </v-card-text>
       </v-card>
     </v-navigation-drawer>
