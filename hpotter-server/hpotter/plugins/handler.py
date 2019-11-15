@@ -5,17 +5,23 @@ import re
 import sys
 import subprocess
 import yaml
+from OpenSSL import crypto
 
 from hpotter.env import logger
 from hpotter.plugins.generic import PipeThread
 from hpotter.plugins import ssh, telnet
 
+
 class Singletons():
     active_plugins = {}
 
+global set_cert
+set_cert = False
+
 class Plugin(yaml.YAMLObject):
     yaml_tag = u'!plugin'
-    def __init__(self, name=None, setup=None, teardown=None, container=None, alt_container=None, read_only=None, detach=None, ports=None, tls=None, volumes=None, environment=None, listen_address=None, listen_port=None, table=None, capture_length=None, request_type=None):
+
+    def __init__(self, name=None, setup=None, teardown=None, container=None, alt_container=None, read_only=None, detach=None, ports=None, tls=None, volumes=None, environment=None, listen_address=None, listen_port=None, table=None, capture_length=None, request_type=None, cert=None):
         self.name = name
         self.setup = setup
         self.teardown = teardown
@@ -32,19 +38,20 @@ class Plugin(yaml.YAMLObject):
         self.table = table
         self.capture_length = capture_length
         self.request_type = request_type
+        self.cert = cert
 
     def __repr__(self):
-        return "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n tls: %r \n volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n capture_length: %r \n request_type: %r)" % (
-        self.__class__.__name__, self.name, self.setup,
-        self.teardown, self.container, self.read_only, self.detach,
-        self.ports, self.tls, self.volumes, self.environment, self.listen_address,
-        self.listen_port, self.table, self.capture_length, self.request_type)
+        return "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n tls: %r \n volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n capture_length: %r \n request_type: %r cert: %r \n)" % (
+            self.__class__.__name__, self.name, self.setup,
+            self.teardown, self.container, self.read_only, self.detach,
+            self.ports, self.tls, self.volumes, self.environment, self.listen_address,
+            self.listen_port, self.table, self.capture_length, self.request_type, self.cert)
 
     def contains_volumes(self):
         return self.volumes == []
 
     def makeports(self):
-        return {self.ports["from"] : self.ports["connect_port"]}
+        return {self.ports["from"]: self.ports["connect_port"]}
 
     @staticmethod
     def read_in_plugins(container_name):
@@ -53,21 +60,22 @@ class Plugin(yaml.YAMLObject):
             for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
                 if (data["name"] == container_name):
                     present = True
-                    return Plugin(name=data['name'], \
-                              setup=data['setup'], \
-                              teardown=data['teardown'], \
-                              container=data['container'], \
-                              alt_container=data['alt_container'], \
-                              read_only=data['read_only'], \
-                              detach=data['detach'], \
-                              ports=data['ports'], \
-                              tls=data['tls'],\
-                              volumes=data['volumes'], \
-                              environment=data['environment'], \
-                              listen_address=data['listen_address'], \
-                              listen_port=data['listen_port'], \
-                              table=data['table'], \
-                              capture_length=data['capture_length'], request_type=data['request_type'])
+                    return Plugin(name=data['name'],
+                                  setup=data['setup'],
+                                  teardown=data['teardown'],
+                                  container=data['container'],
+                                  alt_container=data['alt_container'],
+                                  read_only=data['read_only'],
+                                  detach=data['detach'],
+                                  ports=data['ports'],
+                                  tls=data['tls'],
+                                  volumes=data['volumes'],
+                                  environment=data['environment'],
+                                  listen_address=data['listen_address'],
+                                  listen_port=data['listen_port'],
+                                  table=data['table'],
+                                  capture_length=data['capture_length'], request_type=data['request_type'],
+                                  cert=data['cert'])
             if (present == None):
                 print("plugin definintion not present")
 
@@ -76,21 +84,23 @@ class Plugin(yaml.YAMLObject):
         plugins = []
         with open('hpotter/plugins/config.yml') as file:
             for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
-                p = Plugin(name=data['name'], setup=data['setup'], \
-                          teardown=data['teardown'], container=data['container'], \
-                          alt_container=data['alt_container'], \
-                          read_only=data['read_only'], detach=data['detach'], \
-                          ports=data['ports'], tls=data['tls'],\
-                          volumes=data['volumes'], \
-                          environment=data['environment'], \
-                          listen_address=data['listen_address'], \
-                          listen_port=data['listen_port'], table=data['table'], \
-                          capture_length=data['capture_length'], request_type=data['request_type'])
+                p = Plugin(name=data['name'], setup=data['setup'],
+                           teardown=data['teardown'], container=data['container'],
+                           alt_container=data['alt_container'],
+                           read_only=data['read_only'], detach=data['detach'],
+                           ports=data['ports'], tls=data['tls'],
+                           volumes=data['volumes'],
+                           environment=data['environment'],
+                           listen_address=data['listen_address'],
+                           listen_port=data['listen_port'], table=data['table'],
+                           capture_length=data['capture_length'], request_type=data['request_type'],
+                           cert=data['cert'])
                 plugins.append(p)
         return plugins
 
+
 def start_plugins():
-    #ensure Docker is running
+    # ensure Docker is running
     try:
         s = subprocess.check_output('docker ps', shell=True)
     except subprocess.CalledProcessError:
@@ -106,15 +116,18 @@ def start_plugins():
     for plugin in all_plugins:
         if plugin is not None:
             try:
+
+                check_certs(plugin.cert)
                 client = docker.from_env()
 
                 container = plugin.container
-                if platform.machine() == 'armv6l' :
+                if platform.machine() == 'armv6l':
                     container = plugin.alt_container
 
                 try:
                     for cmd in plugin.setup['mkdir']:
-                        logger.info("%s created the %s directory", plugin.name, cmd)
+                        logger.info("%s created the %s directory",
+                                    plugin.name, cmd)
                         os.mkdir(cmd)
                 except FileExistsError:
                     pass
@@ -123,14 +136,14 @@ def start_plugins():
                     return
 
                 if (plugin.volumes):
-                    current_container = client.containers.run(container, \
-                        detach=plugin.detach, ports=plugin.makeports(), \
-                        environment=[plugin.environment])
+                    current_container = client.containers.run(container,
+                                                              detach=plugin.detach, ports=plugin.makeports(),
+                                                              environment=[plugin.environment])
 
                 else:
-                    current_container = client.containers.run(container, \
-                        detach=plugin.detach, ports=plugin.makeports(), \
-                        read_only=True)
+                    current_container = client.containers.run(container,
+                                                              detach=plugin.detach, ports=plugin.makeports(),
+                                                              read_only=True)
 
                 logger.info('Created: %s', plugin.name)
 
@@ -142,26 +155,29 @@ def start_plugins():
                     rm_container()
                 return
 
-            di = lambda a: re.sub(b'([\x00-\x20]|[\x7f-xff])+', b' ', a)
-            
-            current_thread = PipeThread((plugin.listen_address, \
-                plugin.listen_port), (plugin.ports['connect_address'], \
-                plugin.ports['connect_port']), plugin.table, \
-                plugin.capture_length, request_type=plugin.request_type, tls=plugin.tls)
+            def di(a): return re.sub(b'([\x00-\x20]|[\x7f-xff])+', b' ', a)
+
+            current_thread = PipeThread((plugin.listen_address,
+                                         plugin.listen_port), (plugin.ports['connect_address'],
+                                                               plugin.ports['connect_port']), plugin.table,
+                                        plugin.capture_length, request_type=plugin.request_type, tls=plugin.tls)
 
             current_thread.start()
             p_dict = {
-                "plugin" : plugin,
-                "container" : current_container,
-                "thread" : current_thread
+                "plugin": plugin,
+                "container": current_container,
+                "thread": current_thread
             }
             Singletons.active_plugins[plugin.name] = p_dict
         else:
-            logger.info("yaml configuration seems to be missing some important information")
+            logger.info(
+                "yaml configuration seems to be missing some important information")
+
 
 def stop_plugins():
     ssh.stop_server()
     telnet.stop_server()
+    remove_certs()
 
     for name, item in Singletons.active_plugins.items():
         try:
@@ -181,3 +197,48 @@ def stop_plugins():
         logger.info("--- removing %s container", item["plugin"].name)
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
+
+
+def check_certs(cert):
+    if cert != 'None':
+        if not os.path.isfile(cert):
+            create_tls_cert_and_key()
+
+
+def remove_certs():
+    try:
+        if set_cert:
+            os.remove("/tmp/cert.pem")
+            logger.info("removing TLS cert and key")
+    except:
+        pass
+        
+
+def create_tls_cert_and_key():
+    key = crypto.PKey()
+    key.generate_key(crypto.TYPE_RSA, 4096)
+
+    req = crypto.X509Req()
+    subject = req.get_subject()
+    subject.O = 'organization'
+    subject.OU = 'organizationalUnit'
+    req.set_pubkey(key)
+    req.sign(key, "sha256")
+
+    cert = crypto.X509()
+    cert.set_serial_number(1)
+    cert.gmtime_adj_notBefore(0)
+    cert.gmtime_adj_notAfter(31536000)  # 1 year
+    cert.set_issuer(req.get_subject())
+    cert.set_subject(req.get_subject())
+    cert.set_pubkey(req.get_pubkey())
+    cert.sign(key, "sha256")
+
+    logger.info("Created: TLS cert and key")
+    with open("/tmp/cert.pem", "w") as tmp_cert_file:
+        tmp_cert_file.write(crypto.dump_privatekey(
+            crypto.FILETYPE_PEM, key).decode("utf-8"))
+        tmp_cert_file.write(crypto.dump_certificate(
+            crypto.FILETYPE_PEM, cert).decode("utf-8"))
+    global set_cert
+    set_cert = True

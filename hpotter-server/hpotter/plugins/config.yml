@@ -23,6 +23,7 @@ listen_port: 443
 table: Requests
 request_type: 'Web'
 capture_length: COMMAND_LENGTH
+cert: '/tmp/cert.pem'
 --- 
 name: httpipe
 setup:
@@ -48,6 +49,7 @@ listen_port: 80
 table: Requests
 request_type: 'Web'
 capture_length: COMMAND_LENGTH
+cert: None
 ---
 name: mariadb
 setup:
@@ -70,6 +72,7 @@ listen_port: 3306
 table: Requests
 request_type: 'SQL'
 capture_length: COMMAND_LENGTH
+cert: None
 ---
 name: mariadb_tls
 setup:
@@ -92,3 +95,4 @@ listen_port: 3307
 table: Requests
 request_type: 'SQL'
 capture_length: COMMAND_LENGTH
+cert: '/tmp/cert.pem'

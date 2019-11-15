@@ -7,7 +7,7 @@ from hpotter.env import logger, write_db
 # remember to put name in __init__.py
 
 
-def wrap_socket(function):
+def wrapper(function):
     try:
         return function()
     except socket.timeout as timeout:
@@ -45,7 +45,7 @@ class OneWayThread(threading.Thread):
         total = b''
         while 1:
             try:
-                data = wrap_socket(lambda: self.source.recv(4096))
+                data = wrapper(lambda: self.source.recv(4096))
                 if self.dest.getsockname()[1]:
 
                     pass
@@ -59,7 +59,7 @@ class OneWayThread(threading.Thread):
                 total += data
 
             try:
-                wrap_socket(lambda: self.dest.sendall(data))
+                wrapper(lambda: self.dest.sendall(data))
             except Exception:
                 break
             
