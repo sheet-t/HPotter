@@ -11,12 +11,11 @@ from hpotter.env import logger
 from hpotter.plugins.generic import PipeThread
 from hpotter.plugins import ssh, telnet
 
+global set_cert
+set_cert = False
 
 class Singletons():
     active_plugins = {}
-
-global set_cert
-set_cert = False
 
 class Plugin(yaml.YAMLObject):
     yaml_tag = u'!plugin'
@@ -51,7 +50,7 @@ class Plugin(yaml.YAMLObject):
         return self.volumes == []
 
     def makeports(self):
-        return {self.ports["from"]: self.ports["connect_port"]}
+        return {self.ports["from"] : self.ports["connect_port"]}
 
     @staticmethod
     def read_in_plugins(container_name):
@@ -136,14 +135,14 @@ def start_plugins():
                     return
 
                 if (plugin.volumes):
-                    current_container = client.containers.run(container,
-                                                              detach=plugin.detach, ports=plugin.makeports(),
-                                                              environment=[plugin.environment])
+                    current_container = client.containers.run(container, \
+                        detach=plugin.detach, ports=plugin.makeports(), \
+                        environment=[plugin.environment])
 
                 else:
-                    current_container = client.containers.run(container,
-                                                              detach=plugin.detach, ports=plugin.makeports(),
-                                                              read_only=True)
+                    current_container = client.containers.run(container, \
+                        detach=plugin.detach, ports=plugin.makeports(), \
+                        read_only=True)
 
                 logger.info('Created: %s', plugin.name)
 
@@ -157,10 +156,10 @@ def start_plugins():
 
             def di(a): return re.sub(b'([\x00-\x20]|[\x7f-xff])+', b' ', a)
 
-            current_thread = PipeThread((plugin.listen_address,
-                                         plugin.listen_port), (plugin.ports['connect_address'],
-                                                               plugin.ports['connect_port']), plugin.table,
-                                        plugin.capture_length, request_type=plugin.request_type, tls=plugin.tls)
+            current_thread = PipeThread((plugin.listen_address, \
+                plugin.listen_port), (plugin.ports['connect_address'], \
+                plugin.ports['connect_port']), plugin.table, \
+                plugin.capture_length, request_type=plugin.request_type, tls=plugin.tls)
 
             current_thread.start()
             p_dict = {
@@ -198,47 +197,53 @@ def stop_plugins():
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
 
+def check_platform():
+    if platform.system() == 'Linux' or 'Darwin':
+        return '/tmp/cert.pem'
+    elif platform.system() == 'Windows':
+        return "C:/tmp/cert.pem"
+    
 
-def check_certs(cert):
-    if cert != 'None':
-        if not os.path.isfile(cert):
-            create_tls_cert_and_key()
+def check_certs(yml_cert):
+    tmp_file = check_platform()
+    if yml_cert != 'None':
+        if not os.path.isfile(tmp_file):
+            create_tls_cert_and_key(tmp_file)
 
 
 def remove_certs():
+    tmp_file = check_platform()
     try:
         if set_cert:
-            os.remove("/tmp/cert.pem")
+            os.remove(tmp_file)
             logger.info("removing TLS cert and key")
     except:
-        pass
+        raise FileNotFoundError
         
 
-def create_tls_cert_and_key():
+def create_tls_cert_and_key(tmp_file):
     key = crypto.PKey()
     key.generate_key(crypto.TYPE_RSA, 4096)
 
     req = crypto.X509Req()
     subject = req.get_subject()
-    subject.O = 'organization'
-    subject.OU = 'organizationalUnit'
+    subject.O = 'org'
+    subject.OU = 'orgUnit'
     req.set_pubkey(key)
     req.sign(key, "sha256")
 
     cert = crypto.X509()
     cert.set_serial_number(1)
     cert.gmtime_adj_notBefore(0)
-    cert.gmtime_adj_notAfter(31536000)  # 1 year
+    cert.gmtime_adj_notAfter(31536000)  # one year
     cert.set_issuer(req.get_subject())
     cert.set_subject(req.get_subject())
     cert.set_pubkey(req.get_pubkey())
     cert.sign(key, "sha256")
 
     logger.info("Created: TLS cert and key")
-    with open("/tmp/cert.pem", "w") as tmp_cert_file:
-        tmp_cert_file.write(crypto.dump_privatekey(
-            crypto.FILETYPE_PEM, key).decode("utf-8"))
-        tmp_cert_file.write(crypto.dump_certificate(
-            crypto.FILETYPE_PEM, cert).decode("utf-8"))
+    with open(tmp_file, "w") as tmp_cert_file:
+        tmp_cert_file.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8"))
+        tmp_cert_file.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode("utf-8"))
     global set_cert
     set_cert = True

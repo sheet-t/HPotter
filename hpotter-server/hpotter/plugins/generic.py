@@ -109,7 +109,7 @@ class PipeThread(threading.Thread):
                     source, address = source_socket.accept()
                     if self.tls:
                         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                        context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
+                        context.load_cert_chain(certfile="/tmp/cert.pem", keyfile="/tmp/cert.pem")
                         source = context.wrap_socket(source, server_side=True)
                 except socket.timeout:
                     if self.shutdown_requested:
