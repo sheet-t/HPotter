@@ -73,7 +73,7 @@ def parse_services(data):
 
 def parse_plugins(data):
     list = []
-    for plugins in data[1]:
+    for plugins in data:
         for k, v in plugins.items():
             p = Plugin(name=k, setup=v['setup'], \
                       teardown=v['teardown'], container=v['container'], \
@@ -137,7 +137,7 @@ def start_plugins():
                 logger.info(err)
                 if current_container:
                     logger.info(current_container.logs())
-                    rm_container()
+                    # rm_container()
                 return
 
             di = lambda a: re.sub(b'([\x00-\x20]|[\x7f-xff])+', b' ', a)
