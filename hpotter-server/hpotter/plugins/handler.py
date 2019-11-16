@@ -59,7 +59,7 @@ class Plugin(yaml.YAMLObject):
 
 def read_in_config():
     config = []
-    with open('hpotter/plugins/container_config.yml') as file:
+    with open('hpotter/plugins/config.yml') as file:
         for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
             config.append(data)
     return config
