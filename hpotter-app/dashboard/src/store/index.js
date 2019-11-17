@@ -246,12 +246,12 @@ export default new Vuex.Store({
         },
         SET_CREDENTIALS: async (context) => {
           fetch ('http://localhost:8000/credentials').then( response => {
-            context.commit('SET_REQUESTS', response)
+            context.commit('SET_CREDENTIALS', response)
           })
         },
         SET_LOCALS: async (context) => {
           fetch ('http://localhost:8000/connections?geoip=1').then( response => {
-            context.commit('SET_REQUESTS', response)
+            context.commit('SET_LOCALS', response)
           })
         },
         updateActive(context, value) {
