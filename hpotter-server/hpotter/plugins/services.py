@@ -1,16 +1,48 @@
-import socket
-import sys
-import threading
-from binascii import hexlify
-import paramiko
-from paramiko.py3compat import u, decodebytes
+import socket, socketserver, threading, sys, paramiko
 import _thread
-
 import hpotter.env
-from hpotter import tables
-from hpotter.env import logger, write_db, ssh_server
-from hpotter.docker_shell.shell import fake_shell
 
+from binascii import hexlify
+from paramiko.py3compat import u, decodebytes
+
+from hpotter import tables
+from hpotter.tables import CREDS_LENGTH
+from hpotter.env import logger, write_db, ssh_server, telnet_server
+from hpotter.docker_shell.shell import fake_shell, get_string
+
+
+class Service():
+    def __init__(self, name, address, port):
+        self.name = name
+        self.address = address
+        self.port = port
+        self.server = None
+        self.running = False
+
+    def start(self):
+        if self.name == 'ssh':
+            ssh_server = SshThread(self.address, self.port)
+            threading.Thread(target=ssh_server.run).start()
+            logger.info("The SSH Server is up and running")
+            self.running = True
+            self.server = ssh_server
+        elif name == 'telnet':
+            telnet_handler = TelnetHandler
+            telnet_server = TelnetServer((self.address, self.port), telnet_handler)
+            threading.Thread(target=telnet_server.serve_forever).start()
+            logger.info("Telnet server is up and running")
+            self.running = True
+            self.server = telnet_server
+
+    def stop(self, name, server):
+        if server:
+            if name == 'ssh':
+                self.server.stop()
+                self.running = False
+            elif name == 'telnet':
+                self.server.shutdown()
+                self.running = False
+# SSH brains
 class SSHServer(paramiko.ServerInterface):
     undertest = False
     data = (
@@ -129,13 +161,60 @@ class SshThread(threading.Thread):
         except SystemExit:
             pass
 
-def start_server(address, port):
-    global ssh_server
-    ssh_server = SshThread(address, port)
-    threading.Thread(target=ssh_server.run).start()
-    logger.info("The SSH Server is up and running")
+class TelnetHandler(socketserver.BaseRequestHandler):
 
-def stop_server():
-    if ssh_server:
-        ssh_server.stop()
-        logger.info("The ssh-server was shutdown")
+    def creds(self, prompt):
+        logger.debug('Getting creds')
+        tries = 0
+        response = ''
+        while response == '':
+            self.request.sendall(prompt)
+
+            logger.debug('Before creds get_string')
+            response = get_string(self.request, limit=CREDS_LENGTH, telnet=True)
+
+            tries += 1
+            if tries > 2:
+                logger.debug('Creds no response')
+                raise IOError('no response')
+
+        logger.debug('Creds returning %s', response)
+        return response
+
+    def handle(self):
+        self.request.settimeout(30)
+
+        connection = tables.Connections(
+            sourceIP=self.client_address[0],
+            sourcePort=self.client_address[1],
+            destPort=self.server.socket.getsockname()[1],
+            proto=tables.TCP)
+        write_db(connection)
+
+        try:
+            username = self.creds(b'Username: ')
+            password = self.creds(b'Password: ')
+        except Exception as exception:
+            logger.debug(exception)
+            self.request.close()
+            return
+        logger.debug('After creds')
+
+        creds = tables.Credentials(username=username, password=password, \
+            connection=connection)
+        write_db(creds)
+
+        self.request.sendall(b'Last login: Mon Nov 20 12:41:05 2017 from 8.8.8.8\n')
+
+        prompt = b'\n$: ' if username in ('root', 'admin') else b'\n#: '
+        try:
+            fake_shell(self.request, connection, prompt, telnet=True)
+        except Exception as exc:
+            logger.debug(type(exc))
+            logger.debug(exc)
+            logger.debug('telnet fake_shell threw exception')
+
+        self.request.close()
+        logger.debug('telnet handle finished')
+
+class TelnetServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass

@@ -65,10 +65,10 @@ class TelnetHandler(socketserver.BaseRequestHandler):
 
 class TelnetServer(socketserver.ThreadingMixIn, socketserver.TCPServer): pass
 
-def start_server():
+def start_server(address='0.0.0.0', port=23):
     global telnet_server
     telnet_handler = TelnetHandler
-    telnet_server = TelnetServer(('0.0.0.0', 23), telnet_handler)
+    telnet_server = TelnetServer((address, port), telnet_handler)
     threading.Thread(target=telnet_server.serve_forever).start()
     logger.info("Telnet server is up and running")
 
