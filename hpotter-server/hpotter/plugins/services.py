@@ -161,6 +161,7 @@ class SshThread(threading.Thread):
         except SystemExit:
             pass
 
+# Telnet brains
 class TelnetHandler(socketserver.BaseRequestHandler):
 
     def creds(self, prompt):

@@ -55,15 +55,7 @@ class State():
                 print("removed a %s container" % active['name'])
 
     def run_container(self, plugin):
-        if plugin.volumes:
-            container = self.client.containers.run( plugin.container, \
-                detach=plugin.detach, ports=plugin.makeports(), \
-                environment=[plugin.environment])
-        else:
-            container = self.client.containers.run( plugin.container, \
-                detach=plugin.detach, ports=plugin.makeports(), \
-                read_only=plugin.read_only)
-        self.running_containers.append({'name': client.name, 'id': client.id})
+        plugin.run(self.client)
 
     def remove_container(self, image):
         for active in self.running_containers:

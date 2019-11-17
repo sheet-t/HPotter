@@ -226,7 +226,7 @@ export default new Vuex.Store({
         },
         SET_LOCALS: async (context) => {
           fetch ('http://localhost:8000/connections?geoip=1').then( response => {
-            context.commit('SET_REQUESTS', response)
+            context.commit('SET_LOCALS', response)
           })
         },
         updateActive(context, value) {
