@@ -32,6 +32,7 @@
     table: Requests
     request_type: 'Web'
     capture_length: COMMAND_LENGTH
+    cert: '/tmp/cert.pem'
 - httpipe:
     setup:
         mkdir: ['apache2']
@@ -56,6 +57,8 @@
     table: Requests
     request_type: 'Web'
     capture_length: COMMAND_LENGTH
+    cert: 'None'
+
 - mariadb:
     setup:
         mkdir: ['tmp', 'mysql']
@@ -77,6 +80,7 @@
     table: Requests
     request_type: 'SQL'
     capture_length: COMMAND_LENGTH
+    cert: 'None'
 - mariadb_tls:
     setup:
         mkdir: ['tmp', 'mysql']
@@ -98,4 +102,6 @@
     table: Requests
     request_type: 'SQL'
     capture_length: COMMAND_LENGTH
+    cert: '/tmp/cert.pem'
+
 ---

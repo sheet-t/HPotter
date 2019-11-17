@@ -5,11 +5,14 @@ import re
 import sys
 import subprocess
 import yaml
+from OpenSSL import crypto
 
 from hpotter.env import logger
 from hpotter.plugins.generic import PipeThread
 from hpotter.plugins import ssh, telnet
 
+global set_cert
+set_cert = False
 
 class Singletons():
     active_plugins = {}
@@ -26,7 +29,7 @@ class Plugin(yaml.YAMLObject):
                    alt_container=None, read_only=None, detach=None, \
                    ports=None, tls=None, volumes=None, environment=None, \
                    listen_address=None, listen_port=None, table=None, \
-                   capture_length=None, request_type=None):
+                   capture_length=None, request_type=None, cert=None):
         self.name = name
         self.setup = setup
         self.teardown = teardown
@@ -43,13 +46,14 @@ class Plugin(yaml.YAMLObject):
         self.table = table
         self.capture_length = capture_length
         self.request_type = request_type
+        self.cert = cert
 
     def __repr__(self):
-        return "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n tls: %r \n volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n capture_length: %r \n request_type: %r)" % (
-        self.__class__.__name__, self.name, self.setup,
-        self.teardown, self.container, self.read_only, self.detach,
-        self.ports, self.tls, self.volumes, self.environment, self.listen_address,
-        self.listen_port, self.table, self.capture_length, self.request_type)
+        return "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n tls: %r \n volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n capture_length: %r \n request_type: %r cert: %r \n)" % (
+            self.__class__.__name__, self.name, self.setup,
+            self.teardown, self.container, self.read_only, self.detach,
+            self.ports, self.tls, self.volumes, self.environment, self.listen_address,
+            self.listen_port, self.table, self.capture_length, self.request_type, self.cert)
 
     def contains_volumes(self):
         return self.volumes == []
@@ -88,8 +92,9 @@ def parse_plugins(data):
             list.append(p)
     return list
 
+
 def start_plugins():
-    #ensure Docker is running
+    # ensure Docker is running
     try:
         s = subprocess.check_output('docker ps', shell=True)
     except subprocess.CalledProcessError:
@@ -104,15 +109,18 @@ def start_plugins():
     for plugin in all_plugins:
         if plugin is not None:
             try:
+
+                check_certs(plugin.cert)
                 client = docker.from_env()
 
                 container = plugin.container
-                if platform.machine() == 'armv6l' :
+                if platform.machine() == 'armv6l':
                     container = plugin.alt_container
 
                 try:
                     for cmd in plugin.setup['mkdir']:
-                        logger.info("%s created the %s directory", plugin.name, cmd)
+                        logger.info("%s created the %s directory",
+                                    plugin.name, cmd)
                         os.mkdir(cmd)
                 except FileExistsError:
                     pass
@@ -149,17 +157,20 @@ def start_plugins():
 
             current_thread.start()
             p_dict = {
-                "plugin" : plugin,
-                "container" : current_container,
-                "thread" : current_thread
+                "plugin": plugin,
+                "container": current_container,
+                "thread": current_thread
             }
             Singletons.active_plugins[plugin.name] = p_dict
         else:
-            logger.info("yaml configuration seems to be missing some important information")
+            logger.info(
+                "yaml configuration seems to be missing some important information")
+
 
 def stop_plugins():
     ssh.stop_server()
     telnet.stop_server()
+    remove_certs()
 
     for name, item in Singletons.active_plugins.items():
         try:
@@ -180,9 +191,60 @@ def stop_plugins():
         item["container"].stop()
         logger.info("--- %s container removed", item["plugin"].name)
 
+def check_platform():
+    if platform.system() == 'Linux' or 'Darwin':
+        return '/tmp/cert.pem'
+    elif platform.system() == 'Windows':
+        return "C:/tmp/cert.pem"
+    
+
+def check_certs(yml_cert):
+    tmp_file = check_platform()
+    if yml_cert != 'None':
+        if not os.path.isfile(tmp_file):
+            create_tls_cert_and_key(tmp_file)
+
+
+def remove_certs():
+    tmp_file = check_platform()
+    try:
+        if set_cert:
+            os.remove(tmp_file)
+            logger.info("removing TLS cert and key")
+    except:
+        raise FileNotFoundError
+        
 def start_services(service_config):
     for service in service_config:
         if service.name == 'ssh':
             ssh.start_server(service.address, service.port)
         if service.name == 'telnet':
             telnet.start_server(service.address, service.port)
+            
+def create_tls_cert_and_key(tmp_file):
+    key = crypto.PKey()
+    key.generate_key(crypto.TYPE_RSA, 4096)
+
+    req = crypto.X509Req()
+    subject = req.get_subject()
+    subject.O = 'org'
+    subject.OU = 'orgUnit'
+    req.set_pubkey(key)
+    req.sign(key, "sha256")
+
+    cert = crypto.X509()
+    cert.set_serial_number(1)
+    cert.gmtime_adj_notBefore(0)
+    cert.gmtime_adj_notAfter(31536000)  # one year
+    cert.set_issuer(req.get_subject())
+    cert.set_subject(req.get_subject())
+    cert.set_pubkey(req.get_pubkey())
+    cert.sign(key, "sha256")
+
+    logger.info("Created: TLS cert and key")
+    with open(tmp_file, "w") as tmp_cert_file:
+        tmp_cert_file.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8"))
+        tmp_cert_file.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode("utf-8"))
+    global set_cert
+    set_cert = True
+

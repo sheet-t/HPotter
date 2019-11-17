@@ -7,7 +7,7 @@ from hpotter.env import logger, write_db
 # remember to put name in __init__.py
 
 
-def wrap_socket(function):
+def wrapper(function):
     try:
         return function()
     except socket.timeout as timeout:
@@ -45,7 +45,7 @@ class OneWayThread(threading.Thread):
         total = b''
         while 1:
             try:
-                data = wrap_socket(lambda: self.source.recv(4096))
+                data = wrapper(lambda: self.source.recv(4096))
                 if self.dest.getsockname()[1]:
 
                     pass
@@ -59,7 +59,7 @@ class OneWayThread(threading.Thread):
                 total += data
 
             try:
-                wrap_socket(lambda: self.dest.sendall(data))
+                wrapper(lambda: self.dest.sendall(data))
             except Exception:
                 break
             
@@ -109,7 +109,7 @@ class PipeThread(threading.Thread):
                     source, address = source_socket.accept()
                     if self.tls:
                         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                        context.load_cert_chain(certfile="cert.pem", keyfile="cert.pem")
+                        context.load_cert_chain(certfile="/tmp/cert.pem", keyfile="/tmp/cert.pem")
                         source = context.wrap_socket(source, server_side=True)
                 except socket.timeout:
                     if self.shutdown_requested:
