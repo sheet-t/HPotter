@@ -8,6 +8,9 @@ export default new Vuex.Store({
         active: 1,
         window: 0,
         content: 1,
+        zoom: 1,
+        center: [0, 0],
+        bounds: null,
         requests: [],
         credentials: [],
         locals: [],
@@ -18,6 +21,7 @@ export default new Vuex.Store({
             { name: 'Countries', value: 'None', icon: 'mdi-map-marker', id: '4' }
         ],
         date: new Date(),
+        url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
         viewDate: new Date().toISOString().substr(0, 10),
         weekData: [7, 6, 4, 9, 8, 10, 1],
         labelsWeek: [
@@ -88,6 +92,18 @@ export default new Vuex.Store({
         },
         vectors(state) {
             return state.vectors
+        },
+        url(state) {
+            return state.url
+        },
+        zoom(state) {
+            return state.zoom
+        },
+        center(state) {
+          return state.center
+        },
+        bounds(state) {
+          return state.bounds
         }
     },
     mutations: {
@@ -206,6 +222,15 @@ export default new Vuex.Store({
         },
         updateWindow(state, value) {
             state.window = value
+        },
+        updateZoom(state, value) {
+            state.zoom = value
+        },
+        updateCenter(state, value) {
+            state.center = value
+        },
+        updateBounds(state, value) {
+            state.bounds = value
         }
     },
     actions: {
@@ -237,6 +262,15 @@ export default new Vuex.Store({
         },
         updateWindow(context, value) {
             context.commit('updateWindow', value)
+        },
+        updateZoom(context, value) {
+            context.commit('updateZoom', value)
+        },
+        updateCenter(context, value) {
+            context.commit('updateCenter', value)
+        },
+        updateBounds(context, value) {
+            context.commit('updateBounds', value)
         }
     }
 });
