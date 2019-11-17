@@ -20,6 +20,6 @@ class TestPluginHandler(unittest.TestCase):
         subprocess.call('docker stop $(docker ps -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.call('docker rm $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    def test_read_in_plugins(self):
-        test = Plugin.read_in_plugins('mariadb')
+    def test_read_in_config(self):
+        test = read_in_config()
         self.assertIsNotNone(test)
