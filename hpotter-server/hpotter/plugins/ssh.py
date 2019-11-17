@@ -76,10 +76,10 @@ class SSHServer(paramiko.ServerInterface):
         return True
 
 class SshThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, address='0.0.0.0', port=22):
         super(SshThread, self).__init__()
         self.ssh_socket = socket.socket(socket.AF_INET)
-        self.ssh_socket.bind(('0.0.0.0', 22))
+        self.ssh_socket.bind((address, port))
         self.ssh_socket.listen(4)
         self.chan = None
 
@@ -129,9 +129,9 @@ class SshThread(threading.Thread):
         except SystemExit:
             pass
 
-def start_server():
+def start_server(address, port):
     global ssh_server
-    ssh_server = SshThread()
+    ssh_server = SshThread(address, port)
     threading.Thread(target=ssh_server.run).start()
     logger.info("The SSH Server is up and running")
 
