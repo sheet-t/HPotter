@@ -196,7 +196,7 @@ def check_platform():
         return '/tmp/cert.pem'
     elif platform.system() == 'Windows':
         # os.mkdir('temp')
-        return "temp/cert.pem"
+        return "temp\\cert.pem"
     
 
 def check_certs(yml_cert):
