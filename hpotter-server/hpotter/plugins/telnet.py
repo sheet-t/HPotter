@@ -76,3 +76,14 @@ def stop_server():
     if telnet_server:
         telnet_server.shutdown()
         logger.info("Telnet server was shutdown")
+
+def create_telnet_rules():
+    import iptc
+    table = iptc.Table('filter')
+    telnetrule = iptc.Rule()
+    table.autocommit = False
+    hpotterchain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    telnetrule.target = iptc.Target(telnetrule, "ACCEPT")
+    hpotterchain.insert_rule(telnetrule)
+    table.commit()
+    table.refresh()

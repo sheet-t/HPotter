@@ -139,3 +139,14 @@ def stop_server():
     if ssh_server:
         ssh_server.stop()
         logger.info("The ssh-server was shutdown")
+
+def create_ssh_rules():
+    import iptc
+    table = iptc.Table('filter')
+    sshrule = iptc.Rule()
+    table.autocommit = False
+    hpotterchain = iptc.Chain(iptc.Table(iptc.Table.FILTER), 'INPUT')
+    sshrule.target = iptc.Target(sshrule, "ACCEPT")
+    hpotterchain.insert_rule(sshrule)
+    table.commit()
+    table.refresh()
