@@ -195,7 +195,7 @@ def check_platform():
     if platform.system() == 'Linux' or platform.system() == 'Darwin':
         return '/tmp/cert.pem'
     elif platform.system() == 'Windows':
-        os.mkdir('temp')
+        # os.mkdir('temp')
         return "temp/cert.pem"
     
 
