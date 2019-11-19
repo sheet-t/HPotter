@@ -51,6 +51,17 @@ class Plugin(yaml.YAMLObject):
     def makeports(self):
         return {self.ports["from"] : self.ports["connect_port"]}
 
+    def run(self, client):
+        if self.volumes:
+            return client.containers.run(plugin.container, \
+                detach=plugin.detach, ports=plugin.makeports(), \
+                environment=[plugin.environment])
+        else:
+            return client.containers.run(plugin.container, \
+                detach=plugin.detach, ports=plugin.makeports(), \
+                read_only=plugin.read_only)
+
+
 def read_in_config():
     config = []
     with open('hpotter/plugins/config.yml') as file:
