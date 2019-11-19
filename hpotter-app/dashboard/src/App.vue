@@ -129,9 +129,6 @@ export default {
     kpi() {
       return this.$store.getters.kpi
     },
-    viewDate() {
-      return this.$store.getters.viewDate
-    },
     weekData() {
       return this.$store.getters.weekData
     },
