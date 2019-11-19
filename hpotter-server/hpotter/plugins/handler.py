@@ -192,10 +192,11 @@ def stop_plugins():
         logger.info("--- %s container removed", item["plugin"].name)
 
 def check_platform():
-    if platform.system() == 'Linux' or 'Darwin':
+    if platform.system() == 'Linux' or platform.system() == 'Darwin':
         return '/tmp/cert.pem'
     elif platform.system() == 'Windows':
-        return "C:/tmp/cert.pem"
+        # os.mkdir('temp')
+        return "temp\\cert.pem"
     
 
 def check_certs(yml_cert):
