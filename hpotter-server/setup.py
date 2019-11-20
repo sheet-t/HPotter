@@ -1,10 +1,14 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(name='hpotter',
-      version='1.0',
+      version='0.0.4',
       author='Steve Beaty',
       author_email='drjsb80@gmail.com',
-      url='https://github.com/drsjb80/HPotter',
+      url='https://github.com/sheet-t/HPotter',
+      py_modules=["hpotter"],
       packages=find_packages(),
       data_files=[
         ('hpotter',
@@ -13,9 +17,13 @@ setup(name='hpotter',
              'hpotter/requirements.txt',
              'README.md'])],
       description='An easy to install, configure, and run honeypot',
-      long_description='''An easy to install, configure, and run honeypot.
-It is also relatively straightfoward to extend it to new protocols and
-specific, fake servers.''',
-
+      long_description=long_description,
+      long_description_content_type="text/markdown",
+      classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+      ],
+    python_requires='>=3.6',
     install_requires=['SQLAlchemy', 'SQLAlchemy-Utils', 'paramiko'],
-    license='Python-2.0',)
+    )
