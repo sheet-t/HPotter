@@ -1,14 +1,17 @@
 import os, docker, re, sys, subprocess, yaml, platform
 
-# from hpotter.env import logger
-# from hpotter.plugins import ssh, telnet
+from hpotter.env import logger
+from hpotter.plugins import ssh, telnet
 from hpotter.plugins.handler import Plugin, read_in_config, parse_plugins
 
+<<<<<<< HEAD
 # # TODO: purge hpotter related containers before startup
 # TODO:
 
 MDB = docker.from_env().images.get('mariadb')
 HTTPD = docker.from_env().images.get('httpd:latest')
+=======
+>>>>>>> 69a8424a80e468c251a118a18e2b44b6276e1519
 
 class State():
     def __init__(self):
@@ -59,7 +62,9 @@ class State():
                 print("removed a %s container" % active['name'])
 
     def run_container(self, plugin):
-        plugin.run(self.client)
+        c = plugin.run(self.client)
+        info = {'name': c.name, 'id': c.id}
+        self.running_containers.append(info)
 
     def remove_container(self, image):
         for active in self.running_containers:

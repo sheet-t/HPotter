@@ -53,12 +53,22 @@ class Plugin(yaml.YAMLObject):
 
     def run(self, client):
         if self.volumes:
+<<<<<<< HEAD
             return client.containers.run(container, detach=plugin.detach, \
                     ports=plugin.makeports(), environment=[plugin.environment], \
                     read_only=plugin.read_only)
         else:
             return client.containers.run(container, detach=plugin.detach, \
                     ports=plugin.makeports(), read_only=plugin.read_only)
+=======
+            return client.containers.run(plugin.container, \
+                detach=plugin.detach, ports=plugin.makeports(), \
+                environment=[plugin.environment])
+        else:
+            return client.containers.run(plugin.container, \
+                detach=plugin.detach, ports=plugin.makeports(), \
+                read_only=plugin.read_only)
+>>>>>>> 69a8424a80e468c251a118a18e2b44b6276e1519
 
 
 def read_in_config():
