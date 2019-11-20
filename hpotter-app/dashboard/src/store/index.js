@@ -57,7 +57,8 @@ export default new Vuex.Store({
           return state.credentials
         },
         locals(state) {
-          return state.locals
+          // return state.locals
+          return [[-34.56342,  149.52628], [45.46603,  -127.04978], [-6.94146,  138.69681], [-37.96573,  94.422621], [-19.05868,  -146.22116], [4.58016,  30.50741], [10.43697,  -57.65357], [29.50667,  42.29296], [-24.29913,  84.44681], [32.90324,  62.16455]]
         },
         active(state) {
             return state.active

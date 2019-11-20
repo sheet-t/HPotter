@@ -1,6 +1,7 @@
 import signal, sys, inspect, os
 
 import hpotter.plugins
+from hpotter.docker.controller import State
 from hpotter.plugins.handler import start_plugins, stop_plugins
 from hpotter.env import logger, stop_shell, close_db
 
@@ -25,4 +26,8 @@ else:
     if "__main__" == __name__:
        import win32api
        win32api.SetConsoleCtrlHandler(shutdown_win_servers)
+    s = State()
+    for cont in s.running_containers:
+        for id, name in cont.items():
+            s.remove_container(id)
     start_plugins()

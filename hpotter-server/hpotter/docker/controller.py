@@ -4,13 +4,17 @@ import os, docker, re, sys, subprocess, yaml, platform
 # from hpotter.plugins import ssh, telnet
 from hpotter.plugins.handler import Plugin, read_in_config, parse_plugins
 
+# # TODO: purge hpotter related containers before startup
+# TODO:
+
 MDB = docker.from_env().images.get('mariadb')
 HTTPD = docker.from_env().images.get('httpd:latest')
 
 class State():
     def __init__(self):
         self.client = docker.from_env()
-        self.available_plugins = parse_plugins(read_in_config()[1])
+        self.config = read_in_config()
+        self.available_plugins = parse_plugins(self.config[1])
         self.images = self.get_images()
         self.load_hpot_running_containers()
 

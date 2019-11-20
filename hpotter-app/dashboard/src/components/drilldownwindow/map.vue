@@ -14,7 +14,7 @@
           @update:bounds="boundsUpdated"
         >
           <l-tile-layer :url="url"></l-tile-layer>
-          <l-marker v-for="marker in coords" :lat-lng="marker"></l-marker>
+          <l-marker v-for="marker in coords" v-bind:key="marker" :lat-lng="marker"></l-marker>
         </l-map>
     </v-card-text>
   </v-card>
@@ -38,10 +38,6 @@ export default {
       zoom: 1,
       center: [0, 0],
       bounds: null,
-      coords: [
-        [47.313220, -1.319482],
-        [-48.313220, -1.319482]
-      ],
     };
   },
   methods: {
@@ -54,6 +50,9 @@ export default {
     boundsUpdated (bounds) {
       this.bounds = bounds;
     }
+  },
+  computed: {
+    coords(){ return this.$store.getters.locals }
   }
 }
 </script>

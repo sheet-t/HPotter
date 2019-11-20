@@ -33,6 +33,7 @@ class Service():
             logger.info("Telnet server is up and running")
             self.running = True
             self.server = telnet_server
+        logger.info("%s server is up and running")
 
     def stop(self, name, server):
         if server:
