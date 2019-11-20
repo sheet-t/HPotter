@@ -75,7 +75,7 @@ class Plugin(yaml.YAMLObject):
     @staticmethod
     def read_in_plugins(container_name):
         present = False
-        with open('hpotter/plugins/container-configuration.yml') as file:
+        with open('hpotter/plugins/config.yml') as file:
             for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
                 if (data["name"] == container_name):
                     present = True
