@@ -182,7 +182,7 @@ def start_plugins():
             current_thread = PipeThread((plugin.listen_address, \
                 plugin.listen_port), (plugin.ports['connect_address'], \
                 plugin.ports['connect_port']), plugin.table, \
-                plugin.capture_length, request_type=plugin.request_type)
+                plugin.capture_length, request_type=plugin.request_type, tls=plugin.tls)
 
             current_thread.start()
             p_dict = {
