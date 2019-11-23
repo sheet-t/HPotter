@@ -5,13 +5,28 @@ from hpotter.plugins.handler import start_plugins, stop_plugins
 from hpotter.env import logger, stop_shell, close_db
 
 def shutdown_servers(signum, frame):
-    """Stop all running plugins, shutdown docker shell, close SQLite database"""
+    """
+    Shutdown HPotter servers.
+
+    Stop all running plugins, shutdown docker shell, close SQLite database.
+    
+    Parameters:
+        signum (int): Signal received by HPotter.
+        frame (frame object): Stack frame interrupted by given signum.
+    """
     stop_plugins()
     stop_shell()
     close_db()
 
 def shutdown_win_servers(signum):
-    """Provide a method for shutting down servers that can be parsed by win32api"""
+    """
+    Shutdown HPotter servers (Windows).
+
+    Provide a method for shutting down servers that can be parsed by win32api.
+    
+    Parameters:
+        signum (int): Signal received by HPotter.
+    """
     stop_plugins()
     stop_shell()
     close_db()
