@@ -41,10 +41,10 @@ $ git clone https://github.com/sheet-t/HPotter
 $ cd hpotter-server
 
 # Install Hpotter-server's dependencies
-$ pip install -r requirements.txt
+$ pip install -r hpotter/requirements.txt
 
 # On Windows, use
-$ pip install -r winrequirements.txt
+$ pip install -r hpotter/winrequirements.txt
 
 ```
 
@@ -56,7 +56,7 @@ $ python3 -m hpotter
 
 ```
 
-For more advanced details, see the included README.md file within hotter-server.
+For more advanced details, see the included README.md file within hpotter-server.
 
 ### Hpotter-app
 To clone and run hpotter-app, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) installed on your computer. From your command line:
