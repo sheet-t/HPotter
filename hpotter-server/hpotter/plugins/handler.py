@@ -53,14 +53,6 @@ class Plugin(yaml.YAMLObject):
 
     def run(self, client):
         if self.volumes:
-<<<<<<< HEAD
-            return client.containers.run(container, detach=plugin.detach, \
-                    ports=plugin.makeports(), environment=[plugin.environment], \
-                    read_only=plugin.read_only)
-        else:
-            return client.containers.run(container, detach=plugin.detach, \
-                    ports=plugin.makeports(), read_only=plugin.read_only)
-=======
             return client.containers.run(plugin.container, \
                 detach=plugin.detach, ports=plugin.makeports(), \
                 environment=[plugin.environment])
@@ -68,38 +60,7 @@ class Plugin(yaml.YAMLObject):
             return client.containers.run(plugin.container, \
                 detach=plugin.detach, ports=plugin.makeports(), \
                 read_only=plugin.read_only)
->>>>>>> 69a8424a80e468c251a118a18e2b44b6276e1519
 
-
-def read_in_config():
-    with open('hpotter/plugins/config.yml') as file:
-        for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
-            config.append(data)
-    return config
-
-def parse_services(data):
-    list = []
-    for s in data:
-        for k, v in s.items():
-            list.append(Service(k, v['address'], v['port']))
-    return list
-
-def parse_plugins(data):
-    list = []
-    for plugins in data:
-        for k, v in plugins.items():
-            p = Plugin(name=k, setup=v['setup'], \
-                      teardown=v['teardown'], container=v['container'], \
-                      alt_container=v['alt_container'], \
-                      read_only=v['read_only'], detach=v['detach'], \
-                      ports=v['ports'], tls=v['tls'],\
-                      volumes=v['volumes'], \
-                      environment=v['environment'], \
-                      listen_address=v['listen_address'], \
-                      listen_port=v['listen_port'], table=v['table'], \
-                      capture_length=v['capture_length'], request_type=v['request_type'])
-            list.append(p)
-    return list
 
 # def start_plugins():
 #     #ensure Docker is running

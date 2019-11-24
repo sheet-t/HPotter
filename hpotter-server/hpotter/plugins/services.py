@@ -43,6 +43,14 @@ class Service():
             elif name == 'telnet':
                 self.server.shutdown()
                 self.running = False
+
+def parse_services(data):
+    list = []
+    for s in data:
+        for k, v in s.items():
+            list.append(Service(k, v['address'], v['port']))
+    return list
+
 # SSH brains
 class SSHServer(paramiko.ServerInterface):
     undertest = False

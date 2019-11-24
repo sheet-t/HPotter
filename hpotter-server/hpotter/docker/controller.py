@@ -2,40 +2,24 @@ import os, docker, re, sys, subprocess, yaml, platform
 
 from hpotter.env import logger
 from hpotter.plugins import ssh, telnet
-from hpotter.plugins.handler import Plugin, read_in_config, parse_plugins
+from hpotter.plugins.handler import Plugin
 
-<<<<<<< HEAD
 # # TODO: purge hpotter related containers before startup
 # TODO:
-
-MDB = docker.from_env().images.get('mariadb')
-HTTPD = docker.from_env().images.get('httpd:latest')
-=======
->>>>>>> 69a8424a80e468c251a118a18e2b44b6276e1519
-
 class State():
     def __init__(self):
         self.client = docker.from_env()
-        self.config = read_in_config()
-        self.available_plugins = parse_plugins(self.config[1])
-        self.images = self.get_images()
-        self.load_hpot_running_containers()
+        self.read_in_config()
+        self.load_plugins(self.config[1])
+        # self.load_images()
+        # self.load_hpot_running_containers()
 
-    def get_images(self):
-        image_names = []
-        images = []
+    def load_images(self):
+        self.images = Set([])
         for plugin in self.available_plugins:
-            if image_names:
-                for name in image_names:
-                    if not name == plugin.container:
-                        image_names.append(plugin.container)
-            else:
-                image_names.append(plugin.container)
-
-        for name in image_names:
-            images.append(self.client.images.get(name))
-
-        return images
+            i = self.client.images.get(plugin.container)
+            if i not in images:
+                self.images.add(i)
 
     def load_hpot_running_containers(self):
         self.running_containers = []
@@ -81,3 +65,35 @@ class State():
         for plugin in self.available_plugins:
             if plugin.ports['connect_port'] == port:
                 self.run_container(plugin)
+
+
+    def get_container_instance(self, id):
+        for container in self.running_containers:
+            if container.id == id:
+                return container
+            else:
+                return None
+
+    def read_in_config(self):
+        self.config = []
+        with open('hpotter/plugins/config.yml') as file:
+            for data in yaml.load_all(Loader=yaml.FullLoader, stream=file):
+                for item in data:
+                    self.config.append(data)
+
+    def load_plugins(self, data):
+        list = []
+        for plugins in data:
+            for k, v in plugins.items():
+                p = Plugin(name=k, setup=v['setup'], \
+                          teardown=v['teardown'], container=v['container'], \
+                          alt_container=v['alt_container'], \
+                          read_only=v['read_only'], detach=v['detach'], \
+                          ports=v['ports'], tls=v['tls'],\
+                          volumes=v['volumes'], \
+                          environment=v['environment'], \
+                          listen_address=v['listen_address'], \
+                          listen_port=v['listen_port'], table=v['table'], \
+                          capture_length=v['capture_length'], request_type=v['request_type'])
+                list.append(p)
+        self.available_plugins = list
