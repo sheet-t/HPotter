@@ -9,13 +9,14 @@ client = docker.from_env()
 
 class TestPluginHandler(unittest.TestCase):
     def test_start_server(self):
+        self.assertFalse(Singletons.active_plugins)
         start_plugins()
-        test = client.containers.list()
+        test = Singletons.active_plugins
         self.assertTrue(test)
 
     def test_stop_server(self):
         stop_plugins()
-        test = client.containers.list()
+        test = Singletons.active_plugins
         self.assertFalse(test)
         subprocess.call('docker stop $(docker ps -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.call('docker rm $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
