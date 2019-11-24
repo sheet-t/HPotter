@@ -2,22 +2,25 @@
 A machine learning algorithm that detects and highlights anomalous requests made against the HPotter honey pot data. 
  
 ## Training Datasets
-The training data is held in one of the following paths:
+The training data is held in one of the following locations, depending on the type (http, shell, or sql) of data:
 1. `HPotter/hpotter-app/machine_learning/http_commands/data.tar.gz`
 2. `HPotter/hpotter-app/machine_learning/shell_commands/data.tar.gz`
 3. `HPotter/hpotter-app/machine_learning/sql_commands/data.tar.gz`
 
-To extract the data directory, do one of the following:
-1. `tar -xzvf HPotter/hpotter-app/machine_learning/http_commands/data.tar.gz -C HPotter/hpotter-app/machine_learning/http_commands/`
-2. `tar -xzvf HPotter/hpotter-app/machine_learning/shell_commands/data.tar.gz -C HPotter/hpotter-app/machine_learning/shell_commands/`
-3. `tar -xzvf HPotter/hpotter-app/machine_learning/sql_commands/data.tar.gz -C HPotter/hpotter-app/machine_learning/sql_commands/`
+To extract a particular data directory, do one of the following:
+1. `tar -xzvf HPotter/hpotter-app/machine_learning/http_commands/data.tar.gz 
+-C HPotter/hpotter-app/machine_learning/http_commands/`
+2. `tar -xzvf HPotter/hpotter-app/machine_learning/shell_commands/data.tar.gz 
+-C HPotter/hpotter-app/machine_learning/shell_commands/`
+3. `tar -xzvf HPotter/hpotter-app/machine_learning/sql_commands/data.tar.gz 
+-C HPotter/hpotter-app/machine_learning/sql_commands/`
 
 ## Training
-To ensure the necessary packages are installed, do the following command from the `HPotter/hpotter-app` directory:
+To ensure the necessary packages are installed, run the following command from the `HPotter/hpotter-server` directory:
 
     pip3 install -r requirements.txt 
  
-To train the machine learning algorithm itself, run on of the following commands from the `HPotter/hpotter-app` 
+To train the machine learning algorithm itself, run one of the following commands from the `HPotter/hpotter-app` 
 directory to specify the data to train on:
 
 1. `python3 -m machine_learning.general.learn --data-path machine_learning/http_commands/data`
@@ -38,3 +41,73 @@ integer value then fed into the algorithm, where it attempts to predict/reproduc
 does not match is then considered an anomaly. Below demonstrates a high level architecture of the algorithm:
 
 ![Screen Shot 2019-09-23 at 11 49 45 AM](https://user-images.githubusercontent.com/32188816/65449483-52a9d300-ddf8-11e9-8af0-4d2840a9e167.png)
+
+## General Directory Structure
+The machine learning algorithm itself lives in the `Hpotter/hpotter-app/machine-learning/general/`
+directory, which contains the following files:
+* learn.py
+    * A script that imports all of the necessary modules and initiates the machine learning algorithm
+    training process.
+    
+    * Hyperparameters (for fine tuning the model's performance)
+        * **num_layers** - defines the depth of the neural network (number of layers between the input and output 
+        layers)
+        * **hidden_size** - defines the number of input neurons to each hidden layer
+        * **embedding_size** - defines the size of the embedding matrix (a matrix that maps words into a real-valued 
+        matrix)
+        * **batch_size** - defines the size of the data chunks fed into the learning algorithm as input
+        * **dropout** - defines the amount of input neurons to ignore (crucial to prevent over-fitting) and 
+        helps prevent interdependent learning throughout the data
+        
+    * Other important variables
+        * **epochs** - defines the number of times an entire set of data is forward and backward propagated throughout 
+        the network
+        * **steps** - defines the number of batches needed to complete one epoch
+        
+* model.py
+    * Implementation of the Long Short Term Memory (LSTM) neural network using Tensorflow, and all of the necessary 
+    operations used during training.
+
+* trainer.py
+    * A script that iterates over the data and feeds it into the model defined in `model.py` until the minimum 
+    loss specified is satisfied using Tensorflow. 
+    * Hyperparameters
+        * **min_loss** - defines the minimum amount of error allowed on a prediction
+
+* predictor.py    
+    * Defines a `Predictor` class that utilizes a trained machine learning model read in from one of the `checkpoints`
+     directories and prediction data. The `Predictor` class will evaluate and grade the model's performance against 
+     a threshold. 
+    
+* predict.py
+    * A simple script that makes use of the `predictor.py` file to make predictions using the data given to it. This
+    was written to provide an interface between the front end to provide a data analytics display.
+    * The script will read in data from a JSON file provided from the front end, and write the results to a JSON file
+    for later parsing by the front end. 
+
+## Helpers Directory Structure
+There are a couple of files written to help the with machine learning process's basic functionality
+such as reading in data and parsing out payloads, serializing text to numbers, and creating data
+generators. This functionality is implemented in the following files:
+* helper.py
+    * Defines functions for parsing and extracting the actual payloads out of the data files,
+    and providing generators containing that data.
+    * Since our embeddings need to be a specific length, there is a `padding` function defined 
+    to meet that specific length when data is short.
+    * Defines functions to help with printing the training progress and creating a checkpoints 
+    directory if one doesn't already exist so that the `trainer.py` and `learn.py` scripts can
+    write their progress to a saved checkpoint file during training. 
+
+* parser.py
+    * Defines classes for reading in the data and provides an interface between the data and the
+    machine learning algorithm.
+    * Defines functions for producing data generators as well as determining train/test/validation
+    data splits.
+    
+* vocab.json
+    * A static mapping of characters to integers.
+
+* vocabulary.py
+    * A simple script that translates and serializes characters to integers and integers to 
+    characters, using the `vocab.json` file.
+    

@@ -12,7 +12,6 @@ parser.add_argument('--data-path', required=True, type=str, help='Path from hpot
 args = parser.parse_args()
 data_path = args.data_path
 checkpoints_path = '/'.join(data_path.split('/')[0:2]) + '/checkpoints/'
-print(checkpoints_path)
 create_checkpoints_dir(checkpoints_path)
 d = Data(path=data_path + '/benign_requests.txt')
 rnn = Model(num_layers=2, hidden_size=64, vocab=Vocabulary(), embedding_size=64)
