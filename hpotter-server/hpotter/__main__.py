@@ -4,7 +4,6 @@ import hpotter.plugins
 from hpotter.plugins.handler import start_plugins, stop_plugins
 from hpotter.env import logger, stop_shell, close_db
 
-
 def shutdown_servers(signum, frame):
     stop_plugins()
     if sys.platform == 'linux':
