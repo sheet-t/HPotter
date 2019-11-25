@@ -3,8 +3,7 @@ import signal, sys, inspect, os
 import hpotter.plugins
 from hpotter.plugins.handler import start_plugins, stop_plugins
 from hpotter.env import logger, stop_shell, close_db
-from hpotter.plugins.ssh import create_ssh_rules
-from hpotter.plugins.telnet import create_telnet_rules
+
 
 def shutdown_servers(signum, frame):
     stop_plugins()
