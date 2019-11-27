@@ -15,12 +15,11 @@ from hpotter.plugins import ssh, telnet
 client = docker.from_env()
 class NetBuilder():
     def __init__(self, name=None, ipr=None, gate=None):
-        #set up IP range in a IPAM config for use in the network
+# set up IP range in a IPAM config for use in the network
          self.name = name
          ipam_pool = docker.types.IPAMPool(
                  subnet = ipr + '/24',
                  iprange = ipr + '/24',
-                 #leave gateway empty when constructing a network on localhost
                  gateway = gate,
                  aux_addresses = None
                  )
@@ -33,9 +32,14 @@ class NetBuilder():
                  ipam=ipam_config
                  )
 
-#create network
-network = NetBuilder(name="network_1", ipr='10.3.3.0').network
-logger.info("Network: %s created", network.name)
+# create network
+try:
+    network = NetBuilder(name="network_1", ipr='10.3.3.0').network
+    logger.info("Network: %s created", network.name)
+except docker.errors.APIError as err:
+    logger.info(err)
+    print("Duplicate network found.\n Ensure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
+    sys.exit()
 
 global set_cert
 set_cert = False
