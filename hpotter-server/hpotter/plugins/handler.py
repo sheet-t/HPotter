@@ -32,15 +32,6 @@ class NetBuilder():
                  ipam=ipam_config
                  )
 
-# create network
-try:
-    network = NetBuilder(name="network_1", ipr='10.3.3.0').network
-    logger.info("Network: %s created", network.name)
-except docker.errors.APIError as err:
-    logger.info(err)
-    print("Duplicate network found.\n Ensure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
-    sys.exit()
-
 global set_cert
 set_cert = False
 
@@ -125,6 +116,15 @@ def parse_plugins(data):
 
 
 def start_plugins():
+    # create network
+    try:
+        global network
+        network = NetBuilder(name="network_1", ipr='10.3.3.0').network
+        logger.info("Network: %s created", network.name)
+    except docker.errors.APIError as err:
+        logger.info(err)
+        print("Duplicate network found.\n Ensure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
+        sys.exit()
     # ensure Docker is running
     try:
         s = subprocess.check_output('docker ps', shell=True)
