@@ -114,7 +114,6 @@ def parse_plugins(data):
     return list
 
 def start_network(label):
-    
     try:
         global network
         network = NetBuilder(name=label, ipr='10.3.3.0').network
@@ -123,6 +122,8 @@ def start_network(label):
         logger.info(err)
         print("Duplicate network found.\nEnsure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
         sys.exit()
+def stop_network():
+    network.remove()
 
 def start_plugins():
     # create network
@@ -225,13 +226,13 @@ def stop_plugins():
         network.disconnect(item["container"].name, True)
         network.reload()
 
-        #avoid race conditions between singletons
+        # avoid race conditions between singletons
         lock = threading.Lock()
         lock.acquire()
 
-        #remove network once all containers are disconnected
+        # remove network once all containers are disconnected
         if not network.containers:
-            network.remove()
+            stop_network()
             logger.info("--- network removed")
             lock.release()
         logger.info("--- %s container disconnected from %s", item["plugin"].name, network.name)
