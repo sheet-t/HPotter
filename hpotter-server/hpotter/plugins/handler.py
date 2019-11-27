@@ -113,18 +113,20 @@ def parse_plugins(data):
             list.append(p)
     return list
 
-
-
-def start_plugins():
-    # create network
+def start_network():
+    
     try:
         global network
         network = NetBuilder(name="network_1", ipr='10.3.3.0').network
         logger.info("Network: %s created", network.name)
     except docker.errors.APIError as err:
         logger.info(err)
-        print("Duplicate network found.\n Ensure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
+        print("Duplicate network found.\nEnsure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
         sys.exit()
+
+def start_plugins():
+    # create network
+    start_network()
     # ensure Docker is running
     try:
         s = subprocess.check_output('docker ps', shell=True)
