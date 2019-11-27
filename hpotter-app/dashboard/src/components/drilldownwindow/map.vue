@@ -14,7 +14,7 @@
           @update:bounds="boundsUpdated"
         >
           <l-tile-layer :url="url"></l-tile-layer>
-          <l-marker v-for="marker in locals" :lat-lng="marker"></l-marker>
+          <l-marker v-for="marker in locals" :key="marker" :lat-lng="marker"></l-marker>
         </l-map>
     </v-card-text>
   </v-card>
