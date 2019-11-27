@@ -114,7 +114,6 @@ def parse_plugins(data):
     return list
 
 def start_network(label):
-    
     try:
         global network
         network = NetBuilder(name=label, ipr='10.3.3.0').network
@@ -225,11 +224,11 @@ def stop_plugins():
         network.disconnect(item["container"].name, True)
         network.reload()
 
-        #avoid race conditions between singletons
+        # avoid race conditions between singletons
         lock = threading.Lock()
         lock.acquire()
 
-        #remove network once all containers are disconnected
+        # remove network once all containers are disconnected
         if not network.containers:
             network.remove()
             logger.info("--- network removed")
