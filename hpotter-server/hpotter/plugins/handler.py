@@ -122,6 +122,8 @@ def start_network(label):
         logger.info(err)
         print("Duplicate network found.\nEnsure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
         sys.exit()
+def stop_network():
+    network.remove()
 
 def start_plugins():
     # create network
