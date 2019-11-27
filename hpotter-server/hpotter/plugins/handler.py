@@ -113,11 +113,11 @@ def parse_plugins(data):
             list.append(p)
     return list
 
-def start_network():
+def start_network(label):
     
     try:
         global network
-        network = NetBuilder(name="network_1", ipr='10.3.3.0').network
+        network = NetBuilder(name=label, ipr='10.3.3.0').network
         logger.info("Network: %s created", network.name)
     except docker.errors.APIError as err:
         logger.info(err)
@@ -126,7 +126,7 @@ def start_network():
 
 def start_plugins():
     # create network
-    start_network()
+    start_network("net_1")
     # ensure Docker is running
     try:
         s = subprocess.check_output('docker ps', shell=True)
