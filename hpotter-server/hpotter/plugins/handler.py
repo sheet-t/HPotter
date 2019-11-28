@@ -226,13 +226,13 @@ def stop_plugins():
         network.disconnect(item["container"].name, True)
         network.reload()
 
-        # avoid race conditions between singletons
+        # avoid race conditions
         lock = threading.Lock()
         lock.acquire()
 
         # remove network once all containers are disconnected
         if not network.containers:
-            network.remove()
+            stop_network()
             logger.info("--- network removed")
             lock.release()
         logger.info("--- %s container disconnected from %s", item["plugin"].name, network.name)
