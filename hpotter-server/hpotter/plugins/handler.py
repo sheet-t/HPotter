@@ -226,7 +226,7 @@ def stop_plugins():
         network.disconnect(item["container"].name, True)
         network.reload()
 
-        # avoid race conditions between singletons
+        # avoid race conditions
         lock = threading.Lock()
         lock.acquire()
 
