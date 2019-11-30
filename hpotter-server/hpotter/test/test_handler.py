@@ -5,6 +5,7 @@ import os
 import platform
 import subprocess
 import tempfile
+import socket
 
 from unittest.mock import Mock, MagicMock
 from hpotter.plugins.handler import *
@@ -61,8 +62,19 @@ class TestHandler(unittest.TestCase):
 
     def test_start_services(self):
         #need to come up with a way to test this
-        start_services(MagicMock())
+        service_config = [Service("ssh","0.0.0.0",22)]
+        start_services(service_config)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            self.assertEqual(s.connect_ex(('0.0.0.0', 22)),0)
 
     def test_read_in_config(self):
         test = read_in_config()
         self.assertIsNotNone(test)
+
+    def test_parse_services(self):
+        data = MagicMock()
+        self.assertIsNotNone(parse_services(data))
+
+    def test_parse_plugins(self):
+        data = MagicMock()
+        self.assertIsNotNone(parse_plugins(data))
