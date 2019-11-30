@@ -6,13 +6,13 @@ from hpotter.plugins.handler import start_plugins, stop_plugins
 from hpotter.env import logger, stop_shell, close_db
 
 def shutdown_servers(signum, frame):
-    stop_plugins()
+    stop_hpotter()
     # shell might have been started by telnet, ssh, ...
     stop_shell()
     close_db()
 
 def shutdown_win_servers(signum):
-    stop_plugins()
+    stop_hpotter()
     # shell might have been started by telnet, ssh, ...
     stop_shell()
     close_db()
@@ -35,3 +35,4 @@ if "__main__" == __name__:
     else:
         import win32api
         win32api.SetConsoleCtrlHandler(shutdown_win_servers)
+    start_hpotter()

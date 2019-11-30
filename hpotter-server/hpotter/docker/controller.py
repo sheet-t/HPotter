@@ -6,6 +6,7 @@ from hpotter.plugins.handler import Plugin, remove_certs
 
 class State():
     def __init__(self):
+        check_docker()
         self.client = docker.from_env()
         self.clear_network('network_1')
         self.start_network(name="network_1", ipr='10.3.3.0')
@@ -16,8 +17,8 @@ class State():
             if network.name == name:
                 if network.containers != []:
                     for container in network.containers:
-                        logger.info("removed existing network")
                         container.kill()
+                        logger.info("removed container: %s" % container.id)
                 network.remove()
                 logger.info("removed existing network")
                 break
@@ -100,6 +101,7 @@ class State():
         self.telnet.stop()
 
 def start_hpotter():
+    global hpotter_state
     hpotter_state = State()
 
     for plugin in hpotter_state.available_plugins:
@@ -107,12 +109,19 @@ def start_hpotter():
 
     return hpotter_state
 
-def stop_hpotter(state):
-    ssh.stop_server(state.ssh)
-    telnet.stop_server(state.telnet)
+def stop_hpotter():
+    ssh.stop_server()
+    telnet.stop_server()
     remove_certs()
 
-    for plugin in state.available_plugins:
-        plugin.remove_instance(state.client, state.network)
+    for plugin in hpotter_state.available_plugins:
+        plugin.remove_instance(hpotter_state.client, hpotter_state.network)
 
-    state.network.remove()
+    hpotter_state.network.remove()
+
+def check_docker():
+    try:
+        s = subprocess.check_output('docker ps', shell=True)
+    except subprocess.CalledProcessError:
+        print("Ensure Docker is running, and please try again.")
+        sys.exit()
