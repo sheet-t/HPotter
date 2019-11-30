@@ -20,7 +20,7 @@ class TestHandler(unittest.TestCase):
         stop_shell()
         close_db()
         stop_server()
-        #os.remove("/tmp/cert.pem")
+        #for windows
         #subprocess.call('docker ps -a | xargs -n 1 docker stop', stdin=None, stdout=None, stderr=None, shell=True)
         #subprocess.call('docker ps -a | xargs -n 1 docker rm', stdin=None, stdout=None, stderr=None, shell=True)
 
