@@ -8,7 +8,7 @@ export default new Vuex.Store({
         active: 1,
         window: 0,
         content: 1,
-        zoom: 2,
+        zoom: 1,
         center: [0, 0],
         bounds: null,
         requests: [],
