@@ -8,20 +8,9 @@ class State():
     def __init__(self):
         check_docker()
         self.client = docker.from_env()
-        self.clear_network('network_1')
+        clear_network(self.client, 'network_1')
         self.start_network(name="network_1", ipr='10.3.3.0')
         self.read_in_config()
-
-    def clear_network(self, name):
-        for network in self.client.networks.list():
-            if network.name == name:
-                if network.containers != []:
-                    for container in network.containers:
-                        container.kill()
-                        logger.info("removed container: %s" % container.id)
-                network.remove()
-                logger.info("removed existing network")
-                break
 
     def start_network(self, name=None, ipr=None, gate=None):
         ipam_pool = docker.types.IPAMPool(
@@ -41,6 +30,9 @@ class State():
                 driver="bridge",
                 ipam=ipam_config
         )
+
+    def stop_network(self):
+        clear_network(self.client, self.network.name)
 
     def read_in_config(self):
         config = []
@@ -99,6 +91,22 @@ class State():
     def stop_services(self):
         self.ssh.stop()
         self.telnet.stop()
+
+def clear_network(client, name):
+    try:
+        net = client.networks.get(name)
+
+        for container in net.containers:
+            net.disconnect(container)
+            container.stop()
+            container.remove()
+            logger.info("removed container %s" % container.id)
+
+        net.remove()
+
+    except Exception as exc:
+        logger.info(type(exc))
+        logger.info(exc)
 
 def start_hpotter():
     global hpotter_state

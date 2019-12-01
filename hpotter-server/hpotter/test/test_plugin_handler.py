@@ -8,18 +8,12 @@ from hpotter.plugins.handler import *
 client = docker.from_env()
 
 class TestPluginHandler(unittest.TestCase):
-    def test_start_server(self):
-        start_plugins()
-        test = client.containers.list()
-        self.assertTrue(test)
 
-    def test_stop_server(self):
-        stop_plugins()
-        test = client.containers.list()
-        self.assertFalse(test)
-        subprocess.call('docker stop $(docker ps -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.call('docker rm $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    def check_platform(self):
+        if platform.system() == 'Linux' or platform.system() == 'Darwin':
+            check = '/tmp/cert.pem'
+        elif platform.system() == 'Windows':
+            # os.mkdir('temp')
+            check = "temp\\cert.pem"
 
-    def test_read_in_config(self):
-        test = read_in_config()
-        self.assertIsNotNone(test)
+        self.assertTrue(check, check_platform())

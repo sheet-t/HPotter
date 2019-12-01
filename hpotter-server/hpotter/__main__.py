@@ -2,7 +2,6 @@ import signal, sys, inspect, os
 
 import hpotter.plugins
 from hpotter.docker.controller import State, start_hpotter, stop_hpotter
-from hpotter.plugins.handler import start_plugins, stop_plugins
 from hpotter.env import logger, stop_shell, close_db
 
 def shutdown_servers(signum, frame):
