@@ -1,8 +1,10 @@
 import unittest
-from unittest.mock import patch, PropertyMock, Mock, MagicMock, call
+from unittest.mock import patch, MagicMock
+
 from hpotter.plugins.plugin import Plugin
 
 container_name = MagicMock()
+
 
 class TestPlugin(unittest.TestCase):
     def test_init(self):
@@ -23,12 +25,28 @@ class TestPlugin(unittest.TestCase):
         self.capture_length = unittest.mock.Mock()
 
     def test_repr(self):
-        return "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n capture_length: %r \n alt_container: %r)" % (
-        unittest.mock.Mock(), unittest.mock.Mock(), unittest.mock.Mock(),
-        unittest.mock.Mock(), unittest.mock.Mock(), unittest.mock.Mock(),
-        unittest.mock.Mock(), unittest.mock.Mock(), unittest.mock.Mock(),
-        unittest.mock.Mock(), unittest.mock.Mock(), unittest.mock.Mock(),
-        unittest.mock.Mock(), unittest.mock.Mock(), unittest.mock.Mock())
+        return (
+            "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n "
+            "volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n "
+            "capture_length: %r \n alt_container: %r)"
+            % (
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+                unittest.mock.Mock(),
+            )
+        )
 
     def test_contains_volumes(self):
         self.volumes = unittest.mock.Mock()
@@ -36,7 +54,7 @@ class TestPlugin(unittest.TestCase):
 
     def test_makeports(self):
         self.ports = MagicMock()
-        return { self.ports["from"] : self.ports["connect_port"]}
+        return {self.ports["from"]: self.ports["connect_port"]}
 
     def test_read_in_plugins(self):
-        assert (Plugin.read_in_plugins('httpipe'))
+        assert Plugin.read_in_plugins("httpipe")

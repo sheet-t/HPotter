@@ -17,17 +17,33 @@ class Requests(SQLAlchemyObjectType):
 
 
 class Query(graphene.ObjectType):
-    connection = graphene.Field(Connections, id=graphene.Int(), created_at=graphene.DateTime(),
-                                sourceIP=graphene.String(), sourcePort=graphene.Int(),
-                                destPort=graphene.Int(), proto=graphene.Int())
+    connection = graphene.Field(
+        Connections,
+        id=graphene.Int(),
+        created_at=graphene.DateTime(),
+        sourceIP=graphene.String(),
+        sourcePort=graphene.Int(),
+        destPort=graphene.Int(),
+        proto=graphene.Int(),
+    )
     connections = graphene.List(Connections)
 
-    credential = graphene.Field(Credentials, id=graphene.Int(), username=graphene.String(),
-                                password=graphene.String(), connections_id=graphene.Int())
+    credential = graphene.Field(
+        Credentials,
+        id=graphene.Int(),
+        username=graphene.String(),
+        password=graphene.String(),
+        connections_id=graphene.Int(),
+    )
     credentials = graphene.List(Credentials)
 
-    request = graphene.Field(Requests, id=graphene.Int(), request=graphene.String(),
-                             request_type=graphene.String(), connections_id=graphene.Int())
+    request = graphene.Field(
+        Requests,
+        id=graphene.Int(),
+        request=graphene.String(),
+        request_type=graphene.String(),
+        connections_id=graphene.Int(),
+    )
     requests = graphene.List(Requests)
 
     def resolve_connection(self, context, **kwargs):

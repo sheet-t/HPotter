@@ -1,15 +1,16 @@
+import _thread
 import socket
 import sys
 import threading
 from binascii import hexlify
+
 import paramiko
 from paramiko.py3compat import u, decodebytes
-import _thread
 
-import hpotter.env
 from hpotter import tables
-from hpotter.env import logger, write_db, ssh_server
 from hpotter.docker_shell.shell import fake_shell
+from hpotter.env import logger, write_db
+
 
 class SSHServer(paramiko.ServerInterface):
     undertest = False
@@ -17,7 +18,8 @@ class SSHServer(paramiko.ServerInterface):
         b"AAAAB3NzaC1yc2EAAAABIwAAAIEAyO4it3fHlmGZWJaGrfeHOVY7RWO3P9M7hp"
         b"fAu7jJ2d7eothvfeuoRFtJwhUmZDluRdFyhFY/hFAh76PJKGAusIqIQKlkJxMC"
         b"KDqIexkgHAfID/6mqvmnSJf0b5W8v5h2pI/stOSwTQ+pxVhwJ9ctYDhRSlF0iT"
-        b"UWT10hcuO4Ks8=")
+        b"UWT10hcuO4Ks8="
+    )
     good_pub_key = paramiko.RSAKey(data=decodebytes(data))
 
     def __init__(self, connection):
@@ -32,8 +34,9 @@ class SSHServer(paramiko.ServerInterface):
     def check_auth_password(self, username, password):
         # changed so that any username/password can be used
         if username and password:
-            login = tables.Credentials(username=username, password=password, \
-                connection=self.connection)
+            login = tables.Credentials(
+                username=username, password=password, connection=self.connection
+            )
             write_db(login)
 
             return paramiko.AUTH_SUCCESSFUL
@@ -41,20 +44,22 @@ class SSHServer(paramiko.ServerInterface):
 
     def check_auth_publickey(self, username, key):
         print("Auth attempt with key: " + u(hexlify(key.get_fingerprint())))
-        if username == 'exit':
+        if username == "exit":
             sys.exit(1)
-        if(username == "user") and (key == self.good_pub_key):
+        if (username == "user") and (key == self.good_pub_key):
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
 
-    def check_auth_gssapi_with_mic(self, username, \
-        gss_authenticated=paramiko.AUTH_FAILED, cc_file=None):
+    def check_auth_gssapi_with_mic(
+        self, username, gss_authenticated=paramiko.AUTH_FAILED, cc_file=None
+    ):
         if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
 
-    def check_auth_gssapi_keyex(self, username, \
-        gss_authenticated=paramiko.AUTH_FAILED, cc_file=None):
+    def check_auth_gssapi_keyex(
+        self, username, gss_authenticated=paramiko.AUTH_FAILED, cc_file=None
+    ):
         if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
@@ -71,15 +76,17 @@ class SSHServer(paramiko.ServerInterface):
         return True
 
     # pylint: disable=R0913
-    def check_channel_pty_request(self, channel, term, width, height, \
-        pixelwidth, pixelheight, modes):
+    def check_channel_pty_request(
+        self, channel, term, width, height, pixelwidth, pixelheight, modes
+    ):
         return True
+
 
 class SshThread(threading.Thread):
     def __init__(self):
         super(SshThread, self).__init__()
         self.ssh_socket = socket.socket(socket.AF_INET)
-        self.ssh_socket.bind(('0.0.0.0', 22))
+        self.ssh_socket.bind(("0.0.0.0", 22))
         self.ssh_socket.listen(4)
         self.chan = None
 
@@ -96,7 +103,8 @@ class SshThread(threading.Thread):
                 sourceIP=addr[0],
                 sourcePort=addr[1],
                 destPort=self.ssh_socket.getsockname()[1],
-                proto=tables.TCP)
+                proto=tables.TCP,
+            )
             write_db(connection)
 
             transport = paramiko.Transport(client)
@@ -107,20 +115,18 @@ class SshThread(threading.Thread):
             host_key = paramiko.RSAKey(filename="RSAKey.cfg")
             transport.add_server_key(host_key)
 
-
             server = SSHServer(connection)
             transport.start_server(server=server)
 
             self.chan = transport.accept()
             if not self.chan:
-                logger.info('no chan')
+                logger.info("no chan")
                 continue
-            fake_shell(self.chan, connection, '# ')
+            fake_shell(self.chan, connection, "# ")
             self.chan.close()
 
-
     def stop(self):
-        #self.ssh_socket.shutdown(socket.SHUT_WR)
+        # self.ssh_socket.shutdown(socket.SHUT_WR)
         self.ssh_socket.close()
         if self.chan:
             self.chan.close()
@@ -129,11 +135,13 @@ class SshThread(threading.Thread):
         except SystemExit:
             pass
 
+
 def start_server():
     global ssh_server
     ssh_server = SshThread()
     threading.Thread(target=ssh_server.run).start()
     logger.info("The SSH Server is up and running")
+
 
 def stop_server():
     if ssh_server:

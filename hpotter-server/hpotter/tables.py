@@ -36,24 +36,24 @@ class Credentials(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(CREDS_LENGTH))
     password = Column(String(CREDS_LENGTH))
-    connections_id = Column(Integer, ForeignKey('connections.id'))
-    connection = relationship('Connections')
+    connections_id = Column(Integer, ForeignKey("connections.id"))
+    connection = relationship("Connections")
 
 
 class Requests(Base):
     @declared_attr
     def __tablename__(cls):
-        return 'requests'
+        return "requests"
 
     id = Column(Integer, primary_key=True)
     request = Column(String(COMMAND_LENGTH))
     request_type = Column(String(REQUEST_TYPE_LENGTH))
-    connections_id = Column(Integer, ForeignKey('connections.id'))
-    connection = relationship('Connections')
+    connections_id = Column(Integer, ForeignKey("connections.id"))
+    connection = relationship("Connections")
 
 
 def check_for_tables():
-    if engine.dialect.has_table(engine, 'Connections'):
+    if engine.dialect.has_table(engine, "Connections"):
         Base.prepare(engine)
         return engine.dialect.has_table
     else:

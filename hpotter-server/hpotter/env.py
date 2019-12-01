@@ -1,51 +1,55 @@
-import os
-import sys
-import logging
 import logging.config
+import os
 import platform
 import threading
+
 import docker
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 
-logging.config.fileConfig('hpotter/logging.conf')
-logger = logging.getLogger('hpotter')
+logging.config.fileConfig("hpotter/logging.conf")
+logger = logging.getLogger("hpotter")
 
-DB=os.getenv('HPOTTER_DB', 'sqlite')
-DB_USER=os.getenv('HPOTTER_DB_USER', 'root')
-DB_PASSWORD=os.getenv('HPOTTER_DB_PASSWORD', '')
-DB_HOST=os.getenv('HPOTTER_DB_HOST', '127.0.0.1')
-DB_PORT=os.getenv('HPOTTER_DB_PORT', '')
-DB_DB=os.getenv('HPOTTER_DB_DB', 'hpotter')
+DB = os.getenv("HPOTTER_DB", "sqlite")
+DB_USER = os.getenv("HPOTTER_DB_USER", "root")
+DB_PASSWORD = os.getenv("HPOTTER_DB_PASSWORD", "")
+DB_HOST = os.getenv("HPOTTER_DB_HOST", "127.0.0.1")
+DB_PORT = os.getenv("HPOTTER_DB_PORT", "")
+DB_DB = os.getenv("HPOTTER_DB_DB", "hpotter")
 
 db = None
-if DB != 'sqlite':
+if DB != "sqlite":
     if DB_PASSWORD:
-        DB_PASSWORD = ':' + DB_PASSWORD
+        DB_PASSWORD = ":" + DB_PASSWORD
 
     if DB_PORT:
-        DB_PORT = ':' + DB_PORT
+        DB_PORT = ":" + DB_PORT
 
     if DB_DB:
-        DB_DB = '/' + DB_DB
+        DB_DB = "/" + DB_DB
 
-    db = '{0}://{1}{2}@{3}{4}{5}'.format(DB, DB_USER, DB_PASSWORD, \
-        DB_HOST, DB_PORT, DB_DB)
+    db = "{0}://{1}{2}@{3}{4}{5}".format(
+        DB, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_DB
+    )
     logger.debug(db)
 
     def write_db(table):
         session.merge(table)
         session.commit()
+
+
 else:
-    db = 'sqlite:///main.db'
+    db = "sqlite:///main.db"
 
     db_lock = threading.Lock()
+
     def write_db(table):
         with db_lock:
             session.merge(table)
             session.commit()
+
 
 engine = create_engine(db)
 # engine = create_engine(db, echo=True)
@@ -62,13 +66,14 @@ Base.query = session.query_property()
 
 
 def close_db():
-    logger.info('Closing db')
+    logger.info("Closing db")
     session.commit()
     session.close()
-    logger.info('Done closing db')
+    logger.info("Done closing db")
+
 
 # a start, for a Pi 0.
-machine = 'arm32v6/' if platform.machine() == 'armv6l' else ''
+machine = "arm32v6/" if platform.machine() == "armv6l" else ""
 
 busybox = True
 shell_container = None
@@ -77,37 +82,50 @@ shell_container = None
 def get_shell_container():
     return shell_container
 
+
 def start_shell():
     global shell_container
     if shell_container:
-        logger.info('Shell container already started')
+        logger.info("Shell container already started")
         return
 
-    logger.info('Starting shell container')
+    logger.info("Starting shell container")
     client = docker.from_env()
     if busybox:
-        shell_container = client.containers.run(machine + 'busybox:latest', \
-            command=['/bin/ash'], tty=True, detach=True, read_only=True)
+        shell_container = client.containers.run(
+            machine + "busybox:latest",
+            command=["/bin/ash"],
+            tty=True,
+            detach=True,
+            read_only=True,
+        )
     else:
-        shell_container = client.containers.run(machine + 'alpine:latest', \
-            command=['/bin/ash'], user='guest', tty=True, detach=True, \
-                read_only=True)
+        shell_container = client.containers.run(
+            machine + "alpine:latest",
+            command=["/bin/ash"],
+            user="guest",
+            tty=True,
+            detach=True,
+            read_only=True,
+        )
 
     logger.debug(shell_container)
 
-    client.networks.get('bridge').disconnect(shell_container)
+    client.networks.get("bridge").disconnect(shell_container)
+
 
 def stop_shell():
     global shell_container
     if not shell_container:
         return
 
-    logger.info('Stopping shell container')
+    logger.info("Stopping shell container")
     logger.debug(shell_container)
     shell_container.stop()
-    logger.info('Removing shell container')
+    logger.info("Removing shell container")
     shell_container.remove()
     shell_container = None
+
 
 jsonserverport = 8000
 
