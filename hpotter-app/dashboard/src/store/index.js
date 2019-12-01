@@ -12,13 +12,13 @@ export default new Vuex.Store({
         center: [0, 0],
         bounds: null,
         requests: [],
-        credentials: [],
+        credentials: {},
         locals: [],
         kpi: [
             { name: 'Attacks', value: 'None', icon: 'mdi-knife-military', id: '1' },
             { name: 'Attack Vectors', value: 'None', icon: 'mdi-directions-fork', id: '2' },
             { name: 'Creds Used', value: 'None', icon: 'mdi-lock-open-outline', id: '3' },
-            { name: 'Countries', value: 'None', icon: 'mdi-map-marker', id: '4' }
+            { name: 'Locations', value: 'None', icon: 'mdi-map-marker', id: '4' }
         ],
         date: new Date(),
         url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
@@ -198,15 +198,20 @@ export default new Vuex.Store({
           )
         },
         SET_CREDENTIALS(state, promise) {
+          let creds = []
           promise.json().then( data => {
+            for(let item of data) {
+              creds.push(item)
+            }
             state.kpi[2]['value'] = data.length
+            state.credentials = creds
           })
         },
         SET_LOCALS(state, promise) {
-          var locs = []
-          var count = 0
+          let locs = []
+          let count = 0
           promise.json().then( data => {
-            for(var item of data.geometry.coordinates) {
+            for(let item of data.geometry.coordinates) {
               locs.push(item)
               count += 1
             }
