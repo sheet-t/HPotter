@@ -204,18 +204,11 @@ export default new Vuex.Store({
         },
         SET_LOCALS(state, promise) {
           var locs = []
-          //var count = 0
           promise.json().then( data => {
             if(data.geometry.coordinates.length != 0) {
               locs.push(data.geometry.coordinates)
               state.kpi[3]['value'] += 1
             }
-            // locs.push(data.geometry.coordinates)
-            // for (const item of data) {
-            //   locs.push(item['geometry']['coordinates'])
-            //   count = count + 1
-            // }
-            // state.kpi[3]['value'] = count
             state.locals = locs
           })
         },
