@@ -2,11 +2,11 @@ import os
 import re
 import numpy as np
 
-HTTP_RE = re.compile(r"START[\n]-{10}[\n](.*?)[\n]-{10}[\n]END", re.MULTILINE | re.DOTALL)
+RE = re.compile(r"START[\n]-{10}[\n](.*?)[\n]-{10}[\n]END", re.MULTILINE | re.DOTALL)
 
 
 def parse_http(data):
-    return HTTP_RE.findall(data)
+    return RE.findall(data)
 
 
 def get_requests_from_file(path):

@@ -1,19 +1,22 @@
 # HPotter Requests Anomaly Detection
 A machine learning algorithm that detects and highlights anomalous requests made against the HPotter honey pot data. 
  
-## Training Datasets
-The training data is held in one of the following locations, depending on the type (http, shell, or sql) of data:
+## Training Data Sets
+The training data is held in one of the following locations, depending on the type of data (http, shell, or sql):
 1. `HPotter/hpotter-app/machine_learning/http_commands/data.tar.gz`
 2. `HPotter/hpotter-app/machine_learning/shell_commands/data.tar.gz`
 3. `HPotter/hpotter-app/machine_learning/sql_commands/data.tar.gz`
 
-To extract a particular data directory, do one of the following:
+To extract a particular data directory, do one of the following from the parent directory of `HPotter`:
 1. `tar -xzvf HPotter/hpotter-app/machine_learning/http_commands/data.tar.gz 
 -C HPotter/hpotter-app/machine_learning/http_commands/`
 2. `tar -xzvf HPotter/hpotter-app/machine_learning/shell_commands/data.tar.gz 
 -C HPotter/hpotter-app/machine_learning/shell_commands/`
 3. `tar -xzvf HPotter/hpotter-app/machine_learning/sql_commands/data.tar.gz 
 -C HPotter/hpotter-app/machine_learning/sql_commands/`
+
+The data found in these directories has been manually labelled as either benign (data in the benign_requests.txt file)
+or nefarious (data in the anomalous_requests.txt file).
 
 ## Training
 To ensure the necessary packages are installed, run the following command from the `HPotter/hpotter-server` directory:
@@ -35,12 +38,35 @@ Checkpoints of the model's training progress are saved if adjustments need to be
 3. `machine_learning/sql_commands/checkpoints` 
 
 ## Model
-The algorithm used to classify anomalous commands is a Long Short Term Memory (LSTM) Recurrent Neural Network 
-(RNN) that uses a sequence to sequence encoder/decoder of character embeddings. Each character is encoded into an 
-integer value then fed into the algorithm, where it attempts to predict/reproduce the input and anything that
-does not match is then considered an anomaly. Below demonstrates a high level architecture of the algorithm:
+This model implements a particular class of Recurrent Neural Networks (RNNs) called a Long Short Term Memory (LSTM) 
+network. LSTM networks use a sequence to sequence encoder/decoder of character embeddings (n-grams mapped to integers), 
+and are often used for Natural Language Processing (NLP) and classification against text based protocols. Each 
+character is encoded into an integer value then fed into the algorithm, where it attempts to predict/reproduce the 
+input and anything that does not match is then considered an anomaly. Below demonstrates a high level architecture of 
+the algorithm:
 
 ![Screen Shot 2019-09-23 at 11 49 45 AM](https://user-images.githubusercontent.com/32188816/65449483-52a9d300-ddf8-11e9-8af0-4d2840a9e167.png)
+
+The model first needs to have start and finish delimiters, which are defined as `<GO>` and `<EOS>`,
+respectively. The model will need to compute probabilities of letter occurrences, which is why we need to create
+character embeddings that map characters to numeric values. The embedded mapping is defined in 
+`HPotter/hpotter-app/machine_learning/general/helpers/vocab.json`. There are also the `<PAD>` and `<UNK>` symbols which are defined to pad short inputs to equal length and to embed unknown characters, respectively.
+
+The model workflow is defined by the following steps:
+
+1. `<GO>` delimiter is appended to the start of each individual payload, and model processing begins on the character 
+immediately after the `<GO>` delimiter
+2. The model computes the probability of seeing each subsequent character, remembering what characters it has already
+processed (hence the 'Long Short Term Memory' name). In the diagram above, the model will compute `P(P)`, or the 
+probability of a payload starting with the letter `P`, then given that the model has just seen a `P`, it calculates the
+probability of a `P` being followed by an `O`, then an `O` followed by an `S`, and so on until the end of a single
+payload is reached.
+3. If the resulting probability of seeing a particular letter is low, that indicates a malicious/unexpected character
+has been encountered and is likely part of a nefarious payload. 
+4. The resulting probabilities for each letter in a single payload are summed up, then compared against a threshold, 
+and the prediction confidence, `α`, is calculated from our `100 * (1 - α)` confidence interval. If the model's 
+prediction falls within the 91% confidence interval, i.e. `α < 0.09`, the datum sample is deemed as nefarious, 
+otherwise the datum sample is considered benign. 
 
 ## General Directory Structure
 The machine learning algorithm itself lives in the `Hpotter/hpotter-app/machine-learning/general/`
