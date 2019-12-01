@@ -8,7 +8,7 @@ export default new Vuex.Store({
         active: 1,
         window: 0,
         content: 1,
-        zoom: 1,
+        zoom: 2,
         center: [0, 0],
         bounds: null,
         requests: [],
@@ -204,12 +204,14 @@ export default new Vuex.Store({
         },
         SET_LOCALS(state, promise) {
           var locs = []
+          var count = 0
           promise.json().then( data => {
-            if(data.geometry.coordinates.length != 0) {
-              locs.push(data.geometry.coordinates)
-              state.kpi[3]['value'] += 1
+            for(var item of data.geometry.coordinates) {
+              locs.push(item)
+              count += 1
             }
             state.locals = locs
+            state.kpi[3]['value'] = count
           })
         },
         updateActive(state, value) {
