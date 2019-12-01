@@ -15,12 +15,11 @@ from hpotter.plugins import ssh, telnet
 client = docker.from_env()
 class NetBuilder():
     def __init__(self, name=None, ipr=None, gate=None):
-        #set up IP range in a IPAM config for use in the network
+# set up IP range in a IPAM config for use in the network
          self.name = name
          ipam_pool = docker.types.IPAMPool(
                  subnet = ipr + '/24',
                  iprange = ipr + '/24',
-                 #leave gateway empty when constructing a network on localhost
                  gateway = gate,
                  aux_addresses = None
                  )
@@ -32,10 +31,6 @@ class NetBuilder():
                  driver="bridge",
                  ipam=ipam_config
                  )
-
-#create network
-network = NetBuilder(name="network_1", ipr='10.3.3.0').network
-logger.info("Network: %s created", network.name)
 
 global set_cert
 set_cert = False
@@ -118,9 +113,21 @@ def parse_plugins(data):
             list.append(p)
     return list
 
-
+def start_network(label,iprange):
+    try:
+        global network
+        network = NetBuilder(name=label, ipr=iprange).network
+        logger.info("Network: %s created", network.name)
+    except docker.errors.APIError as err:
+        logger.info(err)
+        print("Duplicate network found.\nEnsure all HPotter networks and attached containers are stopped before running HPotter. \n(Refer to DEVELOPER.md for instructions on how to remove duplicate networks)")
+        sys.exit()
+def stop_network():
+    network.remove()
 
 def start_plugins():
+    # create network
+    start_network("net_1","10.3.3.0")
     # ensure Docker is running
     try:
         s = subprocess.check_output('docker ps', shell=True)
@@ -219,13 +226,13 @@ def stop_plugins():
         network.disconnect(item["container"].name, True)
         network.reload()
 
-        #avoid race conditions between singletons
+        # avoid race conditions
         lock = threading.Lock()
         lock.acquire()
 
-        #remove network once all containers are disconnected
+        # remove network once all containers are disconnected
         if not network.containers:
-            network.remove()
+            stop_network()
             logger.info("--- network removed")
             lock.release()
         logger.info("--- %s container disconnected from %s", item["plugin"].name, network.name)
