@@ -10,7 +10,7 @@ class Predictor:
     def __init__(self, checkpoint_path, std_factor, vocab):
         self.thresh = 0.0
         self.checkpoints_path = checkpoint_path
-        self.graph_path = checkpoint_path + 'rnn_checkpoint'
+        self.graph_path = checkpoint_path + "rnn_checkpoint"
         self.std_factor = std_factor
         self.vocab = vocab
         self.__load()
@@ -20,18 +20,18 @@ class Predictor:
             tf.reset_default_graph()
             loaded_graph = tf.Graph()
             with loaded_graph.as_default():
-                saver = tf.train.import_meta_graph(self.graph_path + '.meta')
+                saver = tf.train.import_meta_graph(self.graph_path + ".meta")
             self.sess = tf.Session(graph=loaded_graph)
             saver.restore(self.sess, tf.train.latest_checkpoint(self.checkpoints_path))
-            self.inputs = loaded_graph.get_tensor_by_name('inputs:0')
-            self.targets = loaded_graph.get_tensor_by_name('targets:0')
-            self.lens = loaded_graph.get_tensor_by_name('lens:0')
-            self.dropout = loaded_graph.get_tensor_by_name('dropout:0')
-            self.batch_size_tensor = loaded_graph.get_tensor_by_name('batch_size:0')
-            self.seq_len_tensor = loaded_graph.get_tensor_by_name('max_seq_len:0')
-            self.batch_loss = loaded_graph.get_tensor_by_name('batch_loss:0')
-            self.probabilities = loaded_graph.get_tensor_by_name('probs:0')
-            self.logits = loaded_graph.get_tensor_by_name('logits:0')
+            self.inputs = loaded_graph.get_tensor_by_name("inputs:0")
+            self.targets = loaded_graph.get_tensor_by_name("targets:0")
+            self.lens = loaded_graph.get_tensor_by_name("lens:0")
+            self.dropout = loaded_graph.get_tensor_by_name("dropout:0")
+            self.batch_size_tensor = loaded_graph.get_tensor_by_name("batch_size:0")
+            self.seq_len_tensor = loaded_graph.get_tensor_by_name("max_seq_len:0")
+            self.batch_loss = loaded_graph.get_tensor_by_name("batch_loss:0")
+            self.probabilities = loaded_graph.get_tensor_by_name("probs:0")
+            self.logits = loaded_graph.get_tensor_by_name("logits:0")
         except Exception as err:
             raise ValueError("Unable To Create Model: %s" % err)
 
@@ -43,12 +43,14 @@ class Predictor:
         mean = np.mean(total_loss)
         std = np.std(total_loss)
         self.thresh = mean + (self.std_factor * std)
-        print('\r\n\r\nValidation Loss Mean: ', mean)
-        print('Validation Loss Std: ', std)
-        print('Anomaly Detection Threshold: ', self.thresh)
+        print("\r\n\r\nValidation Loss Mean: ", mean)
+        print("Validation Loss Std: ", std)
+        print("Anomaly Detection Threshold: ", self.thresh)
         return self.thresh
 
-    def predict(self, data_generator, visual=False, num_to_display=100, write_to_json=True):
+    def predict(
+        self, data_generator, visual=False, num_to_display=100, write_to_json=True
+    ):
         losses = []
         preds = []
         alphas_dict = {}
@@ -70,7 +72,9 @@ class Predictor:
                 num_displayed += 1
                 self._visualize(alphas=alphas, X=seq)
             if write_to_json and pred == [1]:
-                alphas_dict['Start Sample %d' % sample_number] = 'Start Sample %d' % sample_number
+                alphas_dict["Start Sample %d" % sample_number] = (
+                    "Start Sample %d" % sample_number
+                )
                 num_displayed += 1
                 for i, x in enumerate(seq):
                     coefficients = alphas[i]
@@ -78,23 +82,27 @@ class Predictor:
 
                     for j in range(len(x)):
                         token = tokens[j]
-                        if token != '<PAD>' and token != '<EOS>' and token != '<UNK>':
+                        if token != "<PAD>" and token != "<EOS>" and token != "<UNK>":
                             alphas_dict[idx] = (token, str(coefficients[j]))
                             idx += 1
-                alphas_dict['End Sample %d' % sample_number] = 'End Sample %d' % sample_number
+                alphas_dict["End Sample %d" % sample_number] = (
+                    "End Sample %d" % sample_number
+                )
                 sample_number += 1
         if write_to_json:
-            with open('dashboard/classified_samples.json', 'a+') as json_handle:
+            with open("dashboard/classified_samples.json", "a+") as json_handle:
                 json_handle.truncate(0)
                 json_handle.write(json.dumps(alphas_dict, indent=4))
         return preds, losses
 
     def write_header(self, title):
-        title = 'Detected %s Anomalies' % str(title)
-        title_wrapper = self._html_tag('title')
-        heading_wrapper = self._html_tag('h1')
-        with open('/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html',
-                  'a+') as anomaly_report:
+        title = "Detected %s Anomalies" % str(title)
+        title_wrapper = self._html_tag("title")
+        heading_wrapper = self._html_tag("h1")
+        with open(
+            "/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html",
+            "a+",
+        ) as anomaly_report:
             anomaly_report.write(title_wrapper(title) + heading_wrapper(title))
 
     def _predict_for_request(self, X, loss):
@@ -106,7 +114,7 @@ class Predictor:
             self.lens: lens,
             self.dropout: 1.0,
             self.batch_size_tensor: 1,
-            self.seq_len_tensor: max_seq_len
+            self.seq_len_tensor: max_seq_len,
         }
         fetches = [self.batch_loss, self.probabilities]
         batch_loss, alphas = self.sess.run(fetches=fetches, feed_dict=feed_dict)
@@ -122,19 +130,20 @@ class Predictor:
         return processed_alphas
 
     def _html_tag(self, tag):
-        def _wrap_text(message=''):
-            if 'span' in tag:
-                return '<{0}>{1}</span>'.format(tag, message)
-            elif tag != 'br':
-                return '<{0}>{1}</{0}>\r\n'.format(tag, message)
+        def _wrap_text(message=""):
+            if "span" in tag:
+                return "<{0}>{1}</span>".format(tag, message)
+            elif tag != "br":
+                return "<{0}>{1}</{0}>\r\n".format(tag, message)
             else:
-                return '\r\n<%s>\r\n' % tag
+                return "\r\n<%s>\r\n" % tag
+
         return _wrap_text
 
     def _visualize(self, alphas, X):
         color_wrapper = self._html_tag('span style="color:red"')
-        newline_wrapper = self._html_tag('br')
-        message = ''
+        newline_wrapper = self._html_tag("br")
+        message = ""
 
         for i, x in enumerate(X):
             coefficients = alphas[i]
@@ -142,13 +151,16 @@ class Predictor:
 
             for j in range(len(x)):
                 token = tokens[j]
-                if token == '\n':
+                if token == "\n":
                     message += newline_wrapper()
-                if token != '<PAD>' and token != '<EOS>' and token != '<UNK>':
+                if token != "<PAD>" and token != "<EOS>" and token != "<UNK>":
                     if coefficients[j] < 0.09:
                         message += color_wrapper(token)
                     else:
                         message += token
             message += newline_wrapper() * 2
-        with open('/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html', 'a+') as anomaly_report:
+        with open(
+            "/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html",
+            "a+",
+        ) as anomaly_report:
             anomaly_report.write(message)

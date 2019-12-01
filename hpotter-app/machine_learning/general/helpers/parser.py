@@ -2,8 +2,11 @@ import random
 
 from sklearn.model_selection import train_test_split
 
-from machine_learning.general.helpers.helper import get_requests_from_file, batch_generator, \
-    single_generator
+from machine_learning.general.helpers.helper import (
+    get_requests_from_file,
+    batch_generator,
+    single_generator,
+)
 from machine_learning.general.helpers.vocabulary import Vocabulary
 
 
@@ -33,7 +36,9 @@ class Data(Reader):
     def _train_test_split(self):
         data, lens = self._shuffle(self.data, self.lens)
         X_train, X_test, y_train, y_test = train_test_split(data, lens, test_size=0.1)
-        X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train, y_train, test_size=0.2
+        )
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test = X_test, y_test
         self.X_val, self.y_val = X_val, y_val
@@ -48,8 +53,13 @@ class Data(Reader):
         return data, lens
 
     def train_gen(self, batch_size, num_epochs):
-        return batch_generator(inputs=self.X_train, lens=self.y_train, num_epochs=num_epochs,
-                               batch_size=batch_size, vocab=self.vocab)
+        return batch_generator(
+            inputs=self.X_train,
+            lens=self.y_train,
+            num_epochs=num_epochs,
+            batch_size=batch_size,
+            vocab=self.vocab,
+        )
 
     def validation_gen(self):
         return single_generator(inputs=self.X_val, lens=self.y_val)
