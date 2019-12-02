@@ -8,8 +8,8 @@ export default new Vuex.Store({
         active: 1,
         window: 0,
         content: 1,
-        zoom: 1,
-        center: [0, 0],
+        zoom: 2,
+        center: [20, 0],
         bounds: null,
         requests: [],
         credentials: [],
@@ -212,7 +212,7 @@ export default new Vuex.Store({
           let count = 0
           promise.json().then( data => {
             for(let item of data.geometry.coordinates) {
-              locs.push(item)
+              locs.push(item.reverse())
               count += 1
             }
             state.locals = locs
