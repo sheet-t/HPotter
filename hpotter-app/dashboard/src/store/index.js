@@ -7,7 +7,7 @@ export default new Vuex.Store({
     state: {
         active: 1,
         window: 0,
-        content: 1,
+        content: 0,
         zoom: 2,
         center: [20, 0],
         bounds: null,
@@ -19,6 +19,28 @@ export default new Vuex.Store({
             { name: 'Attack Vectors', value: 'None', icon: 'mdi-directions-fork', id: '2' },
             { name: 'Creds Used', value: 'None', icon: 'mdi-lock-open-outline', id: '3' },
             { name: 'Locations', value: 'None', icon: 'mdi-map-marker', id: '4' }
+        ],
+        credHeaders: [
+            {
+              text: "Username",
+              align: "left",
+              value: "username"
+            },
+            { 
+              text: "Password",
+              value: "password"
+            }
+        ],
+        vectorHeaders: [
+            {
+              text: "Attack Types",
+              align: "left",
+              value: "name"
+            },
+            {
+              text: "Count",
+              value: "number"
+            }
         ],
         date: new Date(),
         url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
@@ -74,6 +96,12 @@ export default new Vuex.Store({
         },
         kpi(state) {
             return state.kpi
+        },
+        credHeaders(state) {
+            return state.credHeaders
+        },
+        vectorHeaders(state) {
+            return state.vectorHeaders
         },
         viewDate(state) {
             return state.viewDate

@@ -21,6 +21,9 @@
   .theme--dark.v-chip:not(.v-chip--active) {
   background: #293245;
 }
+  .theme--dark.v-data-table {
+    background: #212936;
+  }
 </style>
 
 

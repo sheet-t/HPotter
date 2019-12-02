@@ -4,8 +4,8 @@
   <v-container>
     <v-layout row wrap ma-2>
       <v-flex>
-        <v-window v-model="content">
-          <v-window-item value="1">
+        <v-window :value="content">
+          <v-window-item>
             <attacks :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" />
           </v-window-item>
 
