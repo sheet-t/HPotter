@@ -12,7 +12,7 @@ export default new Vuex.Store({
         center: [0, 0],
         bounds: null,
         requests: [],
-        credentials: {},
+        credentials: [],
         locals: [],
         kpi: [
             { name: 'Attacks', value: 'None', icon: 'mdi-knife-military', id: '1' },
