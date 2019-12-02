@@ -5,10 +5,24 @@
       <div class="display-1 font-weight-thin  text-center">Attack Vectors</div>
     </v-card-text>
     <v-card-text>
-      <!-- TODO: Datatable here, AFTER VUEX -->
+      <v-data-table
+        :headers="vectorHeaders"
+        :items="vectors"
+      ></v-data-table>
     </v-card-text>
   </v-card>
 </template>
 
 
-<script></script>
+<script>
+export default{
+  computed: {
+    vectors() {
+      return this.$store.getters.vectors
+    },
+    vectorHeaders() {
+      return this.$store.getters.vectorHeaders
+    }
+  }
+}
+</script>
