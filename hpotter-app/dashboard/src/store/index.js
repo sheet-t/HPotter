@@ -182,7 +182,7 @@ export default new Vuex.Store({
 
               switch (conn["destPort"]) {
                 case 22:
-                  sshhttp = 1
+                  sshhttp = 2
                   state.vectors[1]['number'] = state.vectors[1]['number'] + 1
                   state.vectors[3]['number'] = state.vectors[3]['number'] + 1
                   break
