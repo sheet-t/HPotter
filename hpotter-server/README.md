@@ -8,7 +8,7 @@ A simple to install and run Honey Pot.
 
 To install the necessary packages, do:
 
-    pip install -r requirements.txt
+    pip install -r hpotter/requirements.txt
 
 To run the honeypot itself, do**:
 
@@ -21,7 +21,7 @@ To run the SQL to JSON webserver, do:
 
 On Windows, to install the necessary packages, do:
 
-    pip install -r winrequirements.txt
+    pip install -r hpotter/winrequirements.txt
     
 To run the honeypot itself, do**:
 

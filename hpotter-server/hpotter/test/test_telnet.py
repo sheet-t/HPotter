@@ -1,4 +1,6 @@
 import unittest
+import subprocess
+import docker 
 from unittest.mock import MagicMock, call
 from hpotter.plugins.telnet import TelnetHandler
 # from hpotter.plugins.telnet import start_server, stop_server
@@ -39,3 +41,12 @@ class TestTelnet(unittest.TestCase):
             call(b'Username: '),
             call(b'Username: '),
             call(b'Username: ')])
+
+    def test_rm_containers(self):
+        client = docker.from_env()
+        test = client.containers.list()
+        if test:
+            subprocess.call('docker stop $(docker ps -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.call('docker rm $(docker ps -a -q)', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            pass

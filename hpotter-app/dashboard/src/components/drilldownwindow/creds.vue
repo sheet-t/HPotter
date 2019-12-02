@@ -5,10 +5,22 @@
       <div class="display-1 font-weight-thin  text-center">Top Credentials</div>
     </v-card-text>
     <v-card-text>
-      <!-- TODO: Datatable here, AFTER VUEX -->
+      <ul>
+        <li v-for="cred in credslist" v-bind:key="cred">
+          username: {{cred.username}}  password: {{cred.password}} count: {{cred.count}}
+        </li>
+      </ul>
     </v-card-text>
   </v-card>
 </template>
 
 
-<script></script>
+<script>
+export default{
+  computed: {
+    credslist() {
+      return this.$store.getters.credentials
+    }
+  }
+}
+</script>

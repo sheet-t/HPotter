@@ -1,0 +1,107 @@
+---
+# Service Configurations
+- ssh:
+    address: 0.0.0.0
+    port: 22
+- telnet:
+    address: 0.0.0.0
+    port: 23
+---
+# Plugin Configuations
+- https:
+    setup:
+        mkdir: ['apache2']
+    teardown:
+        rmdir: ['apache2']
+    container: 'httpd:latest'
+    alt_container: 'arm32v6/httpd:alpine'
+    read_only: True
+    detach: True
+    tls: True
+    ports:
+        from: 80/tcp
+        connect_address: '127.0.0.1'
+        connect_port: 8090
+    volumes:
+        apache2:
+            bind: /usr/local/apache2/logs
+            mode: rw
+    environment: None
+    listen_address: 0.0.0.0
+    listen_port: 443
+    table: Requests
+    request_type: 'Web'
+    capture_length: COMMAND_LENGTH
+    cert: '/tmp/cert.pem'
+- httpipe:
+    setup:
+        mkdir: ['apache2']
+    teardown:
+        rmdir: ['apache2']
+    container: 'httpd:latest'
+    alt_container: 'arm32v6/httpd:alpine'
+    read_only: True
+    detach: True
+    tls: False
+    ports:
+        from: 80/tcp
+        connect_address: '127.0.0.1'
+        connect_port: 8080
+    volumes:
+        apache2:
+            bind: /usr/local/apache2/logs
+            mode: rw
+    environment: None
+    listen_address: 0.0.0.0
+    listen_port: 80
+    table: Requests
+    request_type: 'Web'
+    capture_length: COMMAND_LENGTH
+    cert: 'None'
+
+- mariadb:
+    setup:
+        mkdir: ['tmp', 'mysql']
+    teardown:
+        rmdir: ['tmp', 'mysql']
+    container: 'mariadb:latest'
+    alt_container: 'apcheamitru/arm32v6-mariadb:latest'
+    read_only: True
+    detach: True
+    tls: False
+    ports:
+        from: 3306/tcp
+        connect_address: '127.0.0.2'
+        connect_port: 33060
+    volumes: None
+    environment: 'MYSQL_ALLOW_EMPTY_PASSWORD=yes'
+    listen_address: 0.0.0.0
+    listen_port: 3306
+    table: Requests
+    request_type: 'SQL'
+    capture_length: COMMAND_LENGTH
+    cert: 'None'
+- mariadb_tls:
+    setup:
+        mkdir: ['tmp', 'mysql']
+    teardown:
+        rmdir: ['tmp', 'mysql']
+    container: 'mariadb:latest'
+    alt_container: 'apcheamitru/arm32v6-mariadb:latest'
+    read_only: True
+    detach: True
+    tls: True
+    ports:
+        from: 3307/tcp
+        connect_address: '127.0.0.4'
+        connect_port: 33070
+    volumes: None
+    environment: 'MYSQL_ALLOW_EMPTY_PASSWORD=yes'
+    listen_address: 0.0.0.0
+    listen_port: 3307
+    table: Requests
+    request_type: 'SQL'
+    capture_length: COMMAND_LENGTH
+    cert: '/tmp/cert.pem'
+
+---
