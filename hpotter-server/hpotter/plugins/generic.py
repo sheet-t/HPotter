@@ -2,7 +2,7 @@ import socket, ssl
 import threading
 
 from hpotter import tables
-from hpotter.env import logger, write_db
+from hpotter.env import logger, write_db, getLocalRemote
 
 # remember to put name in __init__.py
 
@@ -38,6 +38,7 @@ class OneWayThread(threading.Thread):
                 sourceIP=self.source.getsockname()[0],
                 sourcePort=self.source.getsockname()[1],
                 destPort=self.dest.getsockname()[1],
+                localRemote = getLocalRemote(addr[0]),
                 proto=tables.TCP)
             write_db(self.connection)
         

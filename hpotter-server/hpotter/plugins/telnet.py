@@ -3,7 +3,7 @@ import threading
 
 from hpotter import tables
 from hpotter.tables import CREDS_LENGTH
-from hpotter.env import logger, write_db, telnet_server
+from hpotter.env import logger, write_db, telnet_server, getLocalRemote
 from hpotter.docker_shell.shell import fake_shell, get_string
 
 # https://docs.python.org/3/library/socketserver.html
@@ -34,6 +34,7 @@ class TelnetHandler(socketserver.BaseRequestHandler):
             sourceIP=self.client_address[0],
             sourcePort=self.client_address[1],
             destPort=self.server.socket.getsockname()[1],
+            localRemote = getLocalRemote(addr[0]),
             proto=tables.TCP)
         write_db(connection)
 
