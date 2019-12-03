@@ -107,4 +107,3 @@ class Predictor:
             coefficients = coefficients / coefficients.max()
             processed_alphas.append(coefficients)
         return processed_alphas
-

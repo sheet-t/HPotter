@@ -5,14 +5,14 @@ import numpy as np
 RE = re.compile(r"START[\n]-{10}[\n](.*?)[\n]-{10}[\n]END", re.MULTILINE | re.DOTALL)
 
 
-def parse_http(data):
+def parse_data(data):
     return RE.findall(data)
 
 
 def get_requests_from_file(path):
     with open(path, 'r') as requests_file:
         requests_data = requests_file.read()
-    return parse_http(data=requests_data)
+    return parse_data(data=requests_data)
 
 
 def batch_generator(inputs, lens, num_epochs, batch_size, vocab):
