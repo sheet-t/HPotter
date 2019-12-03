@@ -114,6 +114,8 @@ def shutdown_hpotter():
     for plugin in available_plugins:
         plugin.remove_instance(client, network)
 
+    network.remove()
+
 def check_docker():
     try:
         s = subprocess.check_output('docker ps', shell=True)

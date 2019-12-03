@@ -1,7 +1,15 @@
 import unittest, docker
-from hpotter.docker.controller import State, stop_hpotter, start_hpotter, clear_network
-
+from hpotter.docker.controller import *
 class TestController(unittest.TestCase):
+
+    def testStartNetwork(self):
+        test_client = docker.from_env()
+        start_network(test_client, name='test_network', ipr='10.0.0.0')
+
+        check = test_client.networks.get('test_network')
+        self.assertTrue(check != None)
+
+        check.remove()
 
     def testClearNetwork(self):
         test_client = docker.from_env()
@@ -19,22 +27,24 @@ class TestController(unittest.TestCase):
 
         self.assertEqual(len(final_nets), len(init_nets))
 
-    def testStartHpotter(self):
-        state = start_hpotter()
+    def testStartupHpotter(self):
         test_client = docker.from_env()
-        self.assertTrue(state.client != None)
+        startup_hpotter()
 
-        net = test_client.networks.get('network_1')
-        self.assertEqual(state.network, net)
+        net = test_client.networks.get('hpotter')
+        self.assertTrue(net != None)
 
-        self.assertEqual(len(net.containers), len(state.available_plugins))
+        containers = net.containers
 
-        self.assertTrue(state.ssh != None)
-        self.assertTrue(state.telnet != None)
+        # should only spinup 4 containers
+        self.assertTrue(len(containers) == 4)
+
+        self.assertTrue(ssh != None)
+        self.assertTrue(telnet != None)
 
     def testStopHpotter(self):
-        stop_hpotter()
+        shutdown_hpotter()
         test_client = docker.from_env()
 
         for net in test_client.networks.list():
-            self.assertTrue(net.name != 'network_1')
+            self.assertFalse(net.name == 'hpotter')
