@@ -37,4 +37,4 @@ class TestController(unittest.TestCase):
         test_client = docker.from_env()
 
         for net in test_client.networks.list():
-            assertTrue(net.name != 'network_1')
+            self.assertTrue(net.name != 'network_1')

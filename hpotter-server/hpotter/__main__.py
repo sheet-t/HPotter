@@ -1,11 +1,11 @@
 import signal, sys, inspect, os
 
 import hpotter.plugins
-from hpotter.docker.controller import State, start_hpotter, stop_hpotter
+from hpotter.docker.controller import startup_hpotter, shutdown_hpotter
 from hpotter.env import logger, stop_shell, close_db
 
 def shutdown_servers(signum, frame):
-    stop_hpotter()
+    shutdown_hpotter()
     # shell might have been started by telnet, ssh, ...
     stop_shell()
     close_db()
@@ -34,4 +34,4 @@ if "__main__" == __name__:
     else:
         import win32api
         win32api.SetConsoleCtrlHandler(shutdown_win_servers)
-    start_hpotter()
+    startup_hpotter()

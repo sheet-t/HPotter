@@ -40,7 +40,6 @@ class Plugin:
         self.cert = cert
         self.instances = []
 
-
     def __repr__(self):
         return "%s( name: %r \n setup: %r \n teardown: %r \n container: %r\n read_only: %r\n detach: %r\n ports: %r \n tls: %r \n volumes: %r \n environment: %r \n listen_address: %r \n listen_port: %r \n table: %r \n capture_length: %r \n request_type: %r cert: %r \n)" % (
             self.__class__.__name__, self.name, self.setup,
@@ -147,16 +146,15 @@ class Plugin:
             if not os.path.isfile(dir):
                 create_tls_cert_and_key(dir)
 
-    def remove_certs():
-        tmp_file = check_platform()
-        try:
-            if set_cert:
-                os.remove(tmp_file)
-                logger.info("removing TLS cert and key")
-        except:
-            raise FileNotFoundError
-
 def create_tls_cert_and_key(tmp_file):
+    """ Generate a cert and place it into the tmp_file location.
+
+    Parameters
+    ----------
+    tmp_file : String
+        The path to were the generated cert should be placed.
+
+    """
     key = crypto.PKey()
     key.generate_key(crypto.TYPE_RSA, 4096)
 
