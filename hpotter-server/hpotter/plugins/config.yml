@@ -7,7 +7,7 @@
     address: 0.0.0.0
     port: 23
 ---
-# Plugin Configuations
+# Plugin Configurations
 - https:
     setup:
         mkdir: ['apache2']

@@ -27,6 +27,8 @@ To run the honeypot itself, do**:
 
     python -m hpotter
 
+    NOTE: To run HPotter without sudo privileges, see "Authbind" in DEVELOPER.md
+
 To run the SQL to JSON webserver, do:
 
     python -m hpotter.jsonserver

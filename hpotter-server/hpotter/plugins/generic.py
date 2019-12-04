@@ -6,7 +6,7 @@ from hpotter.env import logger, write_db
 
 # remember to put name in __init__.py
 
-
+# verifying 'attacker' input
 def wrapper(function):
     try:
         return function()
@@ -22,7 +22,7 @@ def wrapper(function):
 
 # started from: http://code.activestate.com/recipes/114642/
 
-
+# handles each connection, creates an entry in 'connections' table, reads input from 'attacker' (data) and writes to 'requests' table
 class OneWayThread(threading.Thread):
     def __init__(self, source, dest, table=None, request_type='', limit=0, di=None):
         super().__init__()
@@ -63,6 +63,7 @@ class OneWayThread(threading.Thread):
             except Exception:
                 break
             
+            # self.limit changes to a string on a second call, this is a workaround that for now
             if type(len(total)) != type(self.limit):
                 self.limit = 4096
                 if len(total) >= (self.limit) > 0:
@@ -81,7 +82,7 @@ class OneWayThread(threading.Thread):
         self.source.close()
         self.dest.close()
 
-
+# handles each plugin, generating a socket and creating a connection, and calling OneWayThread 
 class PipeThread(threading.Thread):
     def __init__(self, bind_address, connect_address, table, limit, request_type='', di=None, tls=False):
         super().__init__()

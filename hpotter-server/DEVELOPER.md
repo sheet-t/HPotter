@@ -87,3 +87,69 @@ To remove networks individally (requires no containers attached to the network):
 To remove containers from a given network:
 
     docker network disconnect <network name> <container name>
+
+### Removing Docker Volume
+
+Since the average developer will run HPotter multiple times, the docker volume will grow very quickly. "Dangling" containers will stick around and take up a considerable amount of space after a while. So it is important to clear that to avoid some containers from starting and staying up. 
+(We had issues on some machines with the MariaDB container staying up)
+
+To check the volume:
+
+    docker volume ls -fq dangling=true
+
+To remove:
+
+    docker volume rm $(docker volume ls -fq dangling=true)
+
+Note: If a developer is running some containers other than HPotter's it is possible for this command to remove more than HPotter's container volumes. 
+
+
+### MariaDB Not Staying Up 
+
+We suppose MariaDB containers do not stay running after the "mariadb_tls" container is started is due to the fact that we are using the same image for both. This could be particular to the fact that Maria is a database and only one container per a database image can be run a time. 
+
+Solution: Have two different images, one for just "mariadb" and another for "mariadb_tls"
+
+See "Removing Docker Volume" to clear the volume if this and other containers continue to not stay running after startup as well. 
+
+
+### Authbind (Running HPotter without sudo)
+
+To run HPotter on a dedicated device (i.e. a Raspberry Pi) without administrator privileges, use 'authbind' to facilitate binding sockets of ports 1024 and under like 22, 23, 80, and 443. 
+
+Install Authbind:
+
+""" 
+    sudo apt install authbind
+"""
+
+Make files in the authbind directory for each port you wish to bind to in HPotter (must use sudo on this step):
+"""
+    sudo touch /etc/authbind/byport/22
+    sudo touch /etc/authbind/byport/23
+    sudo touch /etc/authbind/byport/80
+    sudo touch /etc/authbind/byport/443
+"""
+
+Change the ownership of these files to the user you want to run HPotter with, in this case the user is 'pi' (must use sudo on this step):
+"""
+    sudo chown pi:pi /etc/authbind/byport/22
+    sudo chown pi:pi /etc/authbind/byport/23
+    sudo chown pi:pi /etc/authbind/byport/80
+    sudo chown pi:pi /etc/authbind/byport/443
+"""
+
+Change the permissions of these files to make them executable to the current user (NOTE: sudo is not used on this step):
+"""
+    chmod 755 /etc/authbind/byport/22
+    chmod 755 /etc/authbind/byport/23
+    chmod 755 /etc/authbind/byport/80
+    chmod 755 /etc/authbind/byport/443
+"""
+
+Now HPotter can be run, using the '--depth 3' option specifying how many files down to pass the authbind permssion. In the current version, the ports are bound three files down from running HPotter in "hpotter-server":
+
+"""
+    authbind python3 -m hpotter --depth 3 
+"""
+
