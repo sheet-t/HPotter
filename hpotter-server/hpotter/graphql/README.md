@@ -28,7 +28,6 @@ query {
       sourceIP
       sourcePort
       destPort
-      localRemote
       proto
     }
     connectionsId
