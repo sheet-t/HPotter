@@ -1,29 +1,28 @@
 # dashboard
 
-## Project setup
+## Details
+This Dashboard is built in VueJS, leveraging VueX for state management and Vuetify for a component library.
+The SPA component is App.vue, which is under App.vue.
+
+For documentation on the components used, see:
+https://vuetifyjs.com/en/components/api-explorer
+
+## Getting Started Working on the dashboard
+
+First install required dependencies with:
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+Then run the development server with:
+
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+When you are ready to build for production, run:
+
 ```
 npm run build
 ```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -1,4 +1,6 @@
 <style scoped></style>
+
+<!-- This is the map for "Locations" -->
 <template>
   <v-card class="mx-auto">
     <v-card-text>

@@ -1,4 +1,6 @@
 <style scoped></style>
+
+<!-- This is the detail window for "attacks" -->
 <template>
   <v-card class="mx-auto text-center">
     <v-card-text>
