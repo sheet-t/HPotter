@@ -2,14 +2,13 @@
 <template>
   <v-card class="mx-auto">
     <v-card-text>
-      <div class="display-1 font-weight-thin  text-center">Top Credentials</div>
+      <div class="display-1 font-weight-thin  text-center">Credentials Used</div>
     </v-card-text>
     <v-card-text>
-      <ul>
-        <li v-for="cred in credslist" v-bind:key="cred">
-          username: {{cred.username}}  password: {{cred.password}} count: {{cred.count}}
-        </li>
-      </ul>
+      <v-data-table
+        :headers="credHeaders"
+        :items="credslist"
+      ></v-data-table>
     </v-card-text>
   </v-card>
 </template>
@@ -20,6 +19,9 @@ export default{
   computed: {
     credslist() {
       return this.$store.getters.credentials
+    },
+    credHeaders() {
+      return this.$store.getters.credHeaders
     }
   }
 }
