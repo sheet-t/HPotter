@@ -2,7 +2,7 @@
 
 ## Details
 This Dashboard is built in VueJS, leveraging VueX for state management and Vuetify for a component library.
-The SPA component is App.vue, which is under App.vue.
+The SPA component is App.vue, which is under /src.
 
 For documentation on the components used, see:
 https://vuetifyjs.com/en/components/api-explorer

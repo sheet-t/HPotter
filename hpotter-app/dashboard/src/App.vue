@@ -44,6 +44,7 @@
     <!--Large View Right Hand Content-->
     <v-navigation-drawer floating right app width="300px" class="hiddenNav">
       <div class="mt-8">
+        <!-- TODO: Datepicker should be able to select ranges of days -->
         <v-date-picker v-model="viewDate"></v-date-picker>
       </div>
       <br />
@@ -82,6 +83,7 @@
               <v-window-item>
                 <v-card>
                   <v-card-text>
+                    <!-- TODO: Full Display of output of ML Algorithm. -->
                     Analytics Here
                   </v-card-text>
                 </v-card>
