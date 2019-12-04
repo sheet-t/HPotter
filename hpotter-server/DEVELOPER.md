@@ -54,4 +54,10 @@ Finally:
 ### Pull requests(PR) can be approved by anyone on the team
 To pull a branch to perform a PR:
 
+### Flushing IPtables
+Its best to flush your current IPtable rules for HPotter to work smoothly by running:
+
+     sudo iptables -F
+     sudo iptables -X
+
     git branch -t "branch name"
