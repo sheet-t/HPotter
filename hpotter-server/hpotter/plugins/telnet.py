@@ -34,7 +34,7 @@ class TelnetHandler(socketserver.BaseRequestHandler):
             sourceIP=self.client_address[0],
             sourcePort=self.client_address[1],
             destPort=self.server.socket.getsockname()[1],
-            localRemote = getLocalRemote(addr[0]),
+            localRemote = getLocalRemote(self.client_address[0]),
             proto=tables.TCP)
         write_db(connection)
 
