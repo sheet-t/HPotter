@@ -92,7 +92,7 @@
     detach: True
     tls: True
     ports:
-        from: 3307/tcp
+        from: 3306/tcp
         connect_address: '127.0.0.4'
         connect_port: 33070
     volumes: None
@@ -103,5 +103,4 @@
     request_type: 'SQL'
     capture_length: COMMAND_LENGTH
     cert: '/tmp/cert.pem'
-
 ---
