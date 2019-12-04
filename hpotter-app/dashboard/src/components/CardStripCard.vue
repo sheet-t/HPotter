@@ -15,6 +15,7 @@
 
 </style>
 
+<!-- This is the card that is spawned for each statistic. -->
 <template>
   <v-card v-if="active == kpi.id" width="156" height="140" v-on:click="$emit('update:content')" class="justify-center text-center ma-2 elevation-3 rounded-cards pt-0 mt-0 primary">
     <v-icon size="45" class="pt-5">{{ kpi.icon }}</v-icon>

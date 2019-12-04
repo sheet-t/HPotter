@@ -1,4 +1,10 @@
 <style>
+
+  /* Global Page Style
+  Note that we are not using the standard vuetify grey theme.
+  New components created may require individual CSS rules to
+  not be a different shade of gray */
+
   .theme--dark.v-application {
     background: #2B3648 !important;
 }
@@ -29,14 +35,19 @@
 
 <template>
   <v-app>
-    <v-navigation-drawer floating app class="elevation-3 slateNav"><!--Left Sidebar-->
-      <sideNavBar :window="window"/>
-    </v-navigation-drawer> <!--End Sidebar-->
-    <v-navigation-drawer floating right app width="300px" class="hiddenNav"><!--Right hand content-->
+    <!--Left Sidebar, Navigation-->
+    <v-navigation-drawer floating app class="elevation-3 slateNav">
+      <SidebarContent :window="window"/>
+    </v-navigation-drawer>
+    <!--End Sidebar-->
+
+    <!--Large View Right Hand Content-->
+    <v-navigation-drawer floating right app width="300px" class="hiddenNav">
       <div class="mt-8">
+        <!-- TODO: Datepicker should be able to select ranges of days -->
         <v-date-picker v-model="viewDate"></v-date-picker>
       </div>
-      <br /> <!-- Space with CSS -->
+      <br />
       <v-card class="mr-2 text-center">
         <v-card-title>
         Activity
@@ -46,20 +57,24 @@
         </v-card-text>
       </v-card>
     </v-navigation-drawer>
+    <!--End Right Hand Content-->
+
     <v-content>
       <v-container ma-2>
         <v-row>
           <v-col>
-            <v-window v-model='window'> <!--Main Content-->
+
+            <!--Main Content-->
+            <v-window v-model='window'>
 
               <!--Dashboard-->
               <v-window-item>
                 <v-row>
-                  <cards :kpi="kpi" :content="content" />
+                  <CardStrip :kpi="kpi" :content="content" />
                 </v-row>
 
                 <v-row>
-                  <drillDownWindow :content="content" :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" :vectors="vectors"/>
+                  <CardStripDetailWindow :content="content" :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" :vectors="vectors"/>
                 </v-row>
               </v-window-item>
 
@@ -68,20 +83,27 @@
               <v-window-item>
                 <v-card>
                   <v-card-text>
-                    Analytics Here
+                    <!-- TODO: Full Display of output of ML Algorithm. -->
+                    Analytics Component Here
                   </v-card-text>
                 </v-card>
               </v-window-item>
 
 
-            </v-window> <!--End Main Content-->
+            </v-window>
+            <!--End Main Content-->
+
           </v-col>
+
+          <!-- Floating datepicker for small screens -->
           <v-dialog v-model="dialog" width="300">
             <template v-slot:activator="{ on }">
               <v-fab-transition><v-btn v-on="on" v-show="$vuetify.breakpoint.mdAndDown" fixed dark fab bottom right color="primary"><v-icon>mdi-calendar</v-icon></v-btn></v-fab-transition>
             </template>
             <v-date-picker v-model="viewDate"></v-date-picker>
           </v-dialog>
+          <!-- End Floating datepicker -->
+
         </v-row>
       </v-container>
     </v-content>
@@ -90,9 +112,9 @@
 
 <script>
 
-import sideNavBar from './components/sideNavBar';
-import cards from './components/cards';
-import drillDownWindow from './components/drilldownwindow';
+import SidebarContent from './components/SidebarContent';
+import CardStrip from './components/CardStrip';
+import CardStripDetailWindow from './components/CardStripDetailWindow';
 
 export default {
 
@@ -100,9 +122,9 @@ export default {
 
   name: 'App',
   components: {
-    sideNavBar,
-    cards,
-    drillDownWindow
+    SidebarContent,
+    CardStrip,
+    CardStripDetailWindow
   },
   data: () => ({
     viewDate: new Date().toISOString().substr(0, 10)

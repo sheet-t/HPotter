@@ -1,4 +1,6 @@
 <style scoped></style>
+
+<!-- This is the detail window for "Attack Vectors" -->
 <template>
   <v-card class="mx-auto">
     <v-card-text>

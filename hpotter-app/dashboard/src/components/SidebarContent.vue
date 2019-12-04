@@ -1,4 +1,4 @@
-p,<style scoped>
+<style scoped>
   .titleDrip {
     position: absolute;
     left: 170px;
@@ -6,6 +6,8 @@ p,<style scoped>
     z-index: 4;
   }
 </style>
+
+<!-- Content of sidebar, use for navigation between v-window items in main content -->
 <template>
   <div>
     <v-list nav color="primary">
@@ -26,7 +28,7 @@ p,<style scoped>
       <v-list-item-group v-model="item" color="white">
         <v-list-item
           v-for="(item, i) in items"
-          v-on:click="updateWindow(i)" 
+          v-on:click="updateWindow(i)"
           :key="i">
           <v-list-item-icon>
             <v-icon v-text="item.icon"></v-icon>
