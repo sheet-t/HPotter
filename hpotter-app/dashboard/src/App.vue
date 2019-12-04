@@ -84,7 +84,7 @@
                 <v-card>
                   <v-card-text>
                     <!-- TODO: Full Display of output of ML Algorithm. -->
-                    Analytics Here
+                    Analytics Component Here
                   </v-card-text>
                 </v-card>
               </v-window-item>
