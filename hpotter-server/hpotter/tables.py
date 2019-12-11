@@ -24,6 +24,7 @@ class Connections(Base):
     sourceIP = Column(String)
     sourcePort = Column(Integer)
     destPort = Column(Integer)
+    localRemote = Column(String)
     proto = Column(Integer)
 
 

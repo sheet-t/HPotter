@@ -11,9 +11,9 @@ Both the `Credentials` and `Requests` tables have a relationship to the `Connect
 ### Connections Table
 The connections table has six columns:
 
-| id  | created_at | sourceIP | sourcePort | destPort | proto |
-|:---:|:----------:|:--------:|:----------:|:--------:|:-----:|
-| The primary key | Time of connection | Source IP of connection | Source port of connection | Destination port of connection | Protocol number, either TCP (6) or UDP (17) 
+| id  | created_at | sourceIP | sourcePort | destPort | localRemote | proto |
+|:---:|:----------:|:--------:|:----------:|:--------:|:-----------:|:-----:|
+| The primary key | Time of connection | Source IP of connection | Source port of connection | Destination port of connection | Whether IP address is from a private (local) or global (remote) network | Protocol number, either TCP (6) or UDP (17) 
 
 ### Credentials Table
 The credentials table stores the usernames and passwords used to log in via the Telnet and SSH services. The 
