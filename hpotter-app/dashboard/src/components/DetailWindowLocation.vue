@@ -1,4 +1,6 @@
 <style scoped></style>
+
+<!-- This is the map for "Locations" -->
 <template>
   <v-card class="mx-auto">
     <v-card-text>
@@ -14,7 +16,7 @@
           @update:bounds="boundsUpdated"
         >
           <l-tile-layer :url="url"></l-tile-layer>
-          <l-marker v-for="marker in coords" :lat-lng="marker"></l-marker>
+          <l-marker v-for="marker in locals" :key="marker" :lat-lng="marker"></l-marker>
         </l-map>
     </v-card-text>
   </v-card>
@@ -32,27 +34,32 @@ export default {
         LMarker
     },
 
-  data () {
-    return {
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-      zoom: 1,
-      center: [0, 0],
-      bounds: null,
-      coords: [
-        [47.313220, -1.319482],
-        [-48.313220, -1.319482]
-      ],
-    };
+  computed: {
+    url() {
+      return this.$store.getters.url
+    },
+    zoom() {
+      return this.$store.getters.zoom
+    },
+    center() {
+      return this.$store.getters.center
+    },
+    bounds() {
+      return this.$store.getters.bounds
+    },
+    locals() {
+      return this.$store.getters.locals
+    }
   },
   methods: {
     zoomUpdated (zoom) {
-      this.zoom = zoom;
+      this.$store.dispatch('updateZoom', zoom)
     },
     centerUpdated (center) {
-      this.center = center;
+      this.$store.dispatch('updateCenter', center)
     },
     boundsUpdated (bounds) {
-      this.bounds = bounds;
+      this.$store.dispatch('updateBounds', bounds)
     }
   }
 }

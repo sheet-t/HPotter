@@ -1,24 +1,26 @@
 <style scoped>
 </style>
+
+<!-- Detail window for the currently selected statistic in CardStrip. -->
 <template>
   <v-container>
     <v-layout row wrap ma-2>
       <v-flex>
-        <v-window v-model="content">
-          <v-window-item value="1">
-            <attacks :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" />
+        <v-window :value="content">
+          <v-window-item>
+            <DetailWindowAttacks :valueAttacks="valueAttacks" :labelsAttacks="labelsAttacks" />
           </v-window-item>
 
           <v-window-item value="2">
-            <vectors />
+            <DetailWindowVectors />
           </v-window-item>
 
           <v-window-item value="3">
-            <creds />
+            <DetailWindowCreds />
           </v-window-item>
 
           <v-window-item value="4">
-            <IPmap />
+            <DetailWindowLocation />
           </v-window-item>
         </v-window>
       </v-flex>
@@ -28,17 +30,17 @@
 
 
 <script>
-  import attacks from './drilldownwindow/attacks';
-  import vectors from './drilldownwindow/vectors';
-  import creds from './drilldownwindow/creds';
-  import IPmap from './drilldownwindow/map';
+  import DetailWindowAttacks from './DetailWindowAttacks';
+  import DetailWindowVectors from './DetailWindowVectors';
+  import DetailWindowCreds from './DetailWindowCreds';
+  import DetailWindowLocation from './DetailWindowLocation';
 
   export default{
   components: {
-    attacks,
-    vectors,
-    creds,
-    IPmap
+    DetailWindowAttacks,
+    DetailWindowVectors,
+    DetailWindowCreds,
+    DetailWindowLocation
     },
     computed: {
       content() {

@@ -10,6 +10,7 @@ class CreateConnection(graphene.Mutation):
         sourceIP = graphene.String()
         sourcePort = graphene.Int()
         destPort = graphene.Int()
+        localRemote = graphene.String()
         proto = graphene.Int()
 
     connection = graphene.Field(lambda: ConnectionsObject)
@@ -40,6 +41,7 @@ class UpdateConnection(graphene.Mutation):
         sourceIP = graphene.String()
         sourcePort = graphene.Int()
         destPort = graphene.Int()
+        localRemote = graphene.String()
         proto = graphene.Int()
 
     connection = graphene.Field(lambda: ConnectionsObject)
@@ -56,6 +58,9 @@ class UpdateConnection(graphene.Mutation):
         if 'destPort' in keys:
             session.query(Connections).filter(Connections.id == args['id']). \
                 update({Connections.destPort: args['destPort']})
+        if 'localRemote' in keys:
+            session.query(Connections).filter(Connections.id == args['id']). \
+                update({Connections.localRemote: args['localRemote']})
         if 'proto' in keys:
             session.query(Connections).filter(Connections.id == args['id']). \
                 update({Connections.proto: args['proto']})

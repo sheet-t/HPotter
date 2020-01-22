@@ -8,7 +8,7 @@ import _thread
 
 import hpotter.env
 from hpotter import tables
-from hpotter.env import logger, write_db, ssh_server
+from hpotter.env import logger, write_db, ssh_server, getLocalRemote
 from hpotter.docker_shell.shell import fake_shell
 
 class SSHServer(paramiko.ServerInterface):
@@ -96,6 +96,7 @@ class SshThread(threading.Thread):
                 sourceIP=addr[0],
                 sourcePort=addr[1],
                 destPort=self.ssh_socket.getsockname()[1],
+                localRemote = getLocalRemote(addr[0]),
                 proto=tables.TCP)
             write_db(connection)
 

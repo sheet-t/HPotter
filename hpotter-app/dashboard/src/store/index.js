@@ -7,7 +7,10 @@ export default new Vuex.Store({
     state: {
         active: 1,
         window: 0,
-        content: 1,
+        content: 0,
+        zoom: 2,
+        center: [20, 0],
+        bounds: null,
         requests: [],
         credentials: [],
         locals: [],
@@ -15,9 +18,32 @@ export default new Vuex.Store({
             { name: 'Attacks', value: 'None', icon: 'mdi-knife-military', id: '1' },
             { name: 'Attack Vectors', value: 'None', icon: 'mdi-directions-fork', id: '2' },
             { name: 'Creds Used', value: 'None', icon: 'mdi-lock-open-outline', id: '3' },
-            { name: 'Countries', value: 'None', icon: 'mdi-map-marker', id: '4' }
+            { name: 'Locations', value: 'None', icon: 'mdi-map-marker', id: '4' }
+        ],
+        credHeaders: [
+            {
+              text: "Username",
+              align: "left",
+              value: "username"
+            },
+            { 
+              text: "Password",
+              value: "password"
+            }
+        ],
+        vectorHeaders: [
+            {
+              text: "Attack Types",
+              align: "left",
+              value: "name"
+            },
+            {
+              text: "Count",
+              value: "number"
+            }
         ],
         date: new Date(),
+        url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
         viewDate: new Date().toISOString().substr(0, 10),
         weekData: [7, 6, 4, 9, 8, 10, 1],
         labelsWeek: [
@@ -71,6 +97,12 @@ export default new Vuex.Store({
         kpi(state) {
             return state.kpi
         },
+        credHeaders(state) {
+            return state.credHeaders
+        },
+        vectorHeaders(state) {
+            return state.vectorHeaders
+        },
         viewDate(state) {
             return state.viewDate
         },
@@ -88,6 +120,18 @@ export default new Vuex.Store({
         },
         vectors(state) {
             return state.vectors
+        },
+        url(state) {
+            return state.url
+        },
+        zoom(state) {
+            return state.zoom
+        },
+        center(state) {
+          return state.center
+        },
+        bounds(state) {
+          return state.bounds
         }
     },
     mutations: {
@@ -138,7 +182,7 @@ export default new Vuex.Store({
 
               switch (conn["destPort"]) {
                 case 22:
-                  sshhttp = 1
+                  sshhttp = 2
                   state.vectors[1]['number'] = state.vectors[1]['number'] + 1
                   state.vectors[3]['number'] = state.vectors[3]['number'] + 1
                   break
@@ -182,20 +226,25 @@ export default new Vuex.Store({
           )
         },
         SET_CREDENTIALS(state, promise) {
+          let creds = []
           promise.json().then( data => {
+            for(let item of data) {
+              creds.push(item)
+            }
             state.kpi[2]['value'] = data.length
+            state.credentials = creds
           })
         },
         SET_LOCALS(state, promise) {
-          var locs = []
-          var count = 0
+          let locs = []
+          let count = 0
           promise.json().then( data => {
-            for (const item of data) {
-              locs.push(item['geometry']['coordinates'])
-              count = count + 1
+            for(let item of data.geometry.coordinates) {
+              locs.push(item.reverse())
+              count += 1
             }
-            state.kpi[3]['value'] = count
             state.locals = locs
+            state.kpi[3]['value'] = count
           })
         },
         updateActive(state, value) {
@@ -206,6 +255,15 @@ export default new Vuex.Store({
         },
         updateWindow(state, value) {
             state.window = value
+        },
+        updateZoom(state, value) {
+            state.zoom = value
+        },
+        updateCenter(state, value) {
+            state.center = value
+        },
+        updateBounds(state, value) {
+            state.bounds = value
         }
     },
     actions: {
@@ -221,12 +279,12 @@ export default new Vuex.Store({
         },
         SET_CREDENTIALS: async (context) => {
           fetch ('http://localhost:8000/credentials').then( response => {
-            context.commit('SET_REQUESTS', response)
+            context.commit('SET_CREDENTIALS', response)
           })
         },
         SET_LOCALS: async (context) => {
           fetch ('http://localhost:8000/connections?geoip=1').then( response => {
-            context.commit('SET_REQUESTS', response)
+            context.commit('SET_LOCALS', response)
           })
         },
         updateActive(context, value) {
@@ -237,6 +295,15 @@ export default new Vuex.Store({
         },
         updateWindow(context, value) {
             context.commit('updateWindow', value)
+        },
+        updateZoom(context, value) {
+            context.commit('updateZoom', value)
+        },
+        updateCenter(context, value) {
+            context.commit('updateCenter', value)
+        },
+        updateBounds(context, value) {
+            context.commit('updateBounds', value)
         }
     }
 });

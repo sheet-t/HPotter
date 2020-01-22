@@ -5,6 +5,7 @@ import logging.config
 import platform
 import threading
 import docker
+import ipaddress
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy_utils import database_exists, create_database
@@ -108,6 +109,15 @@ def stop_shell():
     logger.info('Removing shell container')
     shell_container.remove()
     shell_container = None
+
+def getLocalRemote(sourceIP):
+    if ( ipaddress.ip_address(sourceIP).is_private ):
+        return "Local"
+    elif ( ipaddress.ip_address(sourceIP).is_global ):
+        return "Remote"
+    else:
+        #in case it's an unspecified / reserved etc.
+        return "Other" 
 
 jsonserverport = 8000
 

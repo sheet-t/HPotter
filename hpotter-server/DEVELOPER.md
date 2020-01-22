@@ -55,3 +55,35 @@ Finally:
 To pull a branch to perform a PR:
 
     git branch -t "branch name"
+
+## Network Troubleshooting
+
+When making changes to the network structure, it is important that all previously existing HPotter containers and networks are removed before starting HPotter again.
+
+### Stopping running containers
+
+First, stop all running HPotter containers. If you have no other applications using Docker, this can be done by running:
+
+     docker stop $(docker ps -aq)
+
+If you other applications utilizing docker containers, run:
+
+     docker ps
+
+And then run 'docker stop' followed by the specific containers you wish to stop
+
+### Stopping running networks
+
+Since the network is one of the first parts of HPotter that is spun up, it may be required to manually remove it if there are any errors during shutdown of HPotter
+
+To check if the HPotter network is currently active:
+
+    docker network ls
+
+To remove networks individally (requires no containers attached to the network):
+
+    docker network rm <network name>
+
+To remove containers from a given network:
+
+    docker network disconnect <network name> <container name>

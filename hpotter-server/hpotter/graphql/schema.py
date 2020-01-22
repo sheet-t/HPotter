@@ -19,7 +19,7 @@ class Requests(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     connection = graphene.Field(Connections, id=graphene.Int(), created_at=graphene.DateTime(),
                                 sourceIP=graphene.String(), sourcePort=graphene.Int(),
-                                destPort=graphene.Int(), proto=graphene.Int())
+                                destPort=graphene.Int(), localRemote=graphene.String(), proto=graphene.Int())
     connections = graphene.List(Connections)
 
     credential = graphene.Field(Credentials, id=graphene.Int(), username=graphene.String(),

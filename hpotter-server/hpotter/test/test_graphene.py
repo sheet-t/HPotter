@@ -6,7 +6,7 @@ check_for_tables()
 
 from hpotter.graphql.schema import schema
 from graphene.test import Client
-        
+
 
 class TestGraphene(unittest.TestCase):
     def test_connections_crud(self):
@@ -20,8 +20,8 @@ class TestGraphene(unittest.TestCase):
         dest_port = 22
         proto = 6
         mutation = 'mutation { createConnection(sourceIP: "' + str(source_ip) + '", sourcePort: ' + \
-                   str(source_port) + ', destPort: ' + str(dest_port) + ', proto:' + str(proto) + ') { connection ' \
-                   '{ id createdAt sourceIP sourcePort destPort proto } } }'
+                   str(source_port) + ', destPort: ' + str(dest_port) + ', proto:' + str(proto) + ', localRemote: "' + \
+                   'local") { connection { id createdAt sourceIP sourcePort destPort proto localRemote} } }'
         result_dict = client.execute(mutation)
         expected_dict = {"data":
                          {"createConnection":
@@ -31,7 +31,8 @@ class TestGraphene(unittest.TestCase):
                             "sourceIP": source_ip,
                             "sourcePort": source_port,
                             "destPort": dest_port,
-                            "proto": proto
+                            "proto": proto,
+                            "localRemote": "local"
                             }
                            }
                           }
@@ -39,20 +40,23 @@ class TestGraphene(unittest.TestCase):
         self.assertDictEqual(result_dict, expected_dict)  # Assert connection was created
 
         query = ' query { connection(sourceIP: "' + source_ip + '", destPort: ' + str(dest_port) + ', proto: ' + \
-                str(proto) + ') { id createdAt sourceIP sourcePort destPort proto} }'
+                str(proto) + ', localRemote: "local") { id createdAt sourceIP sourcePort destPort proto ' \
+                             'localRemote} }'
         query_result = client.execute(query)
         self.assertEqual("127.0.0.1", query_result['data']['connection']['sourceIP'])  # Assert query read success
         self.assertEqual(22, query_result['data']['connection']['destPort'])  # Assert query read success
         self.assertEqual(6, query_result['data']['connection']['proto'])  # Assert query read success
+        self.assertEqual('local', query_result['data']['connection']['localRemote'])  # Assert query read success
 
         mutation = 'mutation { updateConnection(id: ' + str(next_id) + ', sourceIP: "7.7.7.7", sourcePort: 22,' \
-                   ' destPort: 53, proto:' + str(proto) + ') { connection { id createdAt sourceIP sourcePort ' \
-                   'destPort proto } } }'
+                   ' destPort: 53, proto:' + str(proto) + ', localRemote: "remote") { connection { id createdAt ' \
+                   'sourceIP sourcePort destPort proto localRemote} } }'
         result_dict = client.execute(mutation)
         # Assert the connection was updated
         self.assertEqual("7.7.7.7", result_dict['data']['updateConnection']['connection']['sourceIP'])
         self.assertEqual(22, result_dict['data']['updateConnection']['connection']['sourcePort'])
         self.assertEqual(53, result_dict['data']['updateConnection']['connection']['destPort'])
+        self.assertEqual('remote', result_dict['data']['updateConnection']['connection']['localRemote'])
 
         mutation = "mutation { deleteConnection(id: " + str(next_id) + ") { ok } }"
         result_dict = client.execute(mutation)

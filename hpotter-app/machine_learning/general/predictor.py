@@ -48,7 +48,7 @@ class Predictor:
         print('Anomaly Detection Threshold: ', self.thresh)
         return self.thresh
 
-    def predict(self, data_generator, visual=False, num_to_display=100, write_to_json=True):
+    def predict(self, data_generator, write_to_json=True):
         losses = []
         preds = []
         alphas_dict = {}
@@ -64,11 +64,6 @@ class Predictor:
             pred = mask.astype(int)
             preds.extend(pred)
 
-            if visual and num_displayed < num_to_display and pred == [1]:
-                # print('\r\n\r\nPrediction: ', pred[0])
-                # print('\r\nLoss: ', batch_loss[0])
-                num_displayed += 1
-                self._visualize(alphas=alphas, X=seq)
             if write_to_json and pred == [1]:
                 alphas_dict['Start Sample %d' % sample_number] = 'Start Sample %d' % sample_number
                 num_displayed += 1
@@ -88,14 +83,6 @@ class Predictor:
                 json_handle.truncate(0)
                 json_handle.write(json.dumps(alphas_dict, indent=4))
         return preds, losses
-
-    def write_header(self, title):
-        title = 'Detected %s Anomalies' % str(title)
-        title_wrapper = self._html_tag('title')
-        heading_wrapper = self._html_tag('h1')
-        with open('/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html',
-                  'a+') as anomaly_report:
-            anomaly_report.write(title_wrapper(title) + heading_wrapper(title))
 
     def _predict_for_request(self, X, loss):
         lens = [loss]
@@ -120,35 +107,3 @@ class Predictor:
             coefficients = coefficients / coefficients.max()
             processed_alphas.append(coefficients)
         return processed_alphas
-
-    def _html_tag(self, tag):
-        def _wrap_text(message=''):
-            if 'span' in tag:
-                return '<{0}>{1}</span>'.format(tag, message)
-            elif tag != 'br':
-                return '<{0}>{1}</{0}>\r\n'.format(tag, message)
-            else:
-                return '\r\n<%s>\r\n' % tag
-        return _wrap_text
-
-    def _visualize(self, alphas, X):
-        color_wrapper = self._html_tag('span style="color:red"')
-        newline_wrapper = self._html_tag('br')
-        message = ''
-
-        for i, x in enumerate(X):
-            coefficients = alphas[i]
-            tokens = self.vocab.int_to_string(x)
-
-            for j in range(len(x)):
-                token = tokens[j]
-                if token == '\n':
-                    message += newline_wrapper()
-                if token != '<PAD>' and token != '<EOS>' and token != '<UNK>':
-                    if coefficients[j] < 0.09:
-                        message += color_wrapper(token)
-                    else:
-                        message += token
-            message += newline_wrapper() * 2
-        with open('/Users/jrowell/Desktop/HPotter/hpotter-app/machine_learning/sql_commands/anomaly_report.html', 'a+') as anomaly_report:
-            anomaly_report.write(message)
